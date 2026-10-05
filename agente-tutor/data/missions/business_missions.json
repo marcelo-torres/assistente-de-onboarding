@@ -1,0 +1,68 @@
+[
+  {
+    "id": "biz-01",
+    "title": "Emissão de Documento no Ambiente de Homologação",
+    "description": "Compreender o fluxo de negócio de criação e validação de documentos corporativos através do portal de homologação.",
+    "type": "business",
+    "target_area": "all",
+    "compatible_stacks": ["all"],
+    "min_experience_level": "junior",
+    "estimated_minutes": 30,
+    "prerequisites": ["Acesso à VPN da empresa", "Credenciais de homologação"],
+    "steps": [
+      {
+        "step_number": 1,
+        "title": "Acesso e Autenticação no Ambiente de Homologação",
+        "instruction": "Acesse a URL do ambiente de homologação (https://homolog.portal.interno) e faça login com seu usuário de desenvolvedor.",
+        "expected_action": "Confirmar que a tela inicial carregou com sucesso e reportar o perfil de acesso exibido no canto superior direito.",
+        "hint": "Caso receba erro de certificado ou DNS, verifique se a VPN corporativa está conectada na região correta.",
+        "success_criteria": "Dev confirma acesso ao painel de homologação com seu usuário."
+      },
+      {
+        "step_number": 2,
+        "title": "Navegação até o Módulo de Documentos e Criação de Minuta",
+        "instruction": "Navegue pelo menu lateral até 'Gestão de Documentos' > 'Novo Documento'. Preencha os campos obrigatórios: Tipo = 'Contrato de Serviço', Cliente = 'Empresa Teste Homologação' e Valor = R$ 1.500,00.",
+        "expected_action": "Salvar o documento como Minuta e anotar o código de protocolo gerado (ex: DOC-2026-XXXX).",
+        "hint": "Não é necessário anexar arquivos reais, o sistema aceita um arquivo TXT de teste.",
+        "success_criteria": "Minuta criada com protocolo gerado com sucesso."
+      },
+      {
+        "step_number": 3,
+        "title": "Simulação do Fluxo de Aprovação e Transição de Status",
+        "instruction": "Com a minuta criada, clique em 'Enviar para Análise'. Observe a alteração de status do documento no histórico de auditoria.",
+        "expected_action": "Verificar se o status mudou para 'EM PROCESSAMENTO' ou 'AGUARDANDO APROVAÇÃO' e identificar qual setor é o responsável pela aprovação desse tipo de documento.",
+        "hint": "No fluxo padrão de negócio da empresa, documentos com valor até R$ 5.000 passam pela aprovação automática do motor de regras.",
+        "success_criteria": "Dev compreende a máquina de estados do documento de negócio e confirma a transição de status."
+      }
+    ]
+  },
+  {
+    "id": "biz-02",
+    "title": "Fluxo de Cadastro e Onboarding de Novo Parceiro Comercial",
+    "description": "Explorar o ciclo de vida do cliente corporativo e entender as regras de conformidade e KYC (Know Your Customer).",
+    "type": "business",
+    "target_area": "all",
+    "compatible_stacks": ["all"],
+    "min_experience_level": "junior",
+    "estimated_minutes": 25,
+    "prerequisites": ["Acesso ao ambiente de homologação"],
+    "steps": [
+      {
+        "step_number": 1,
+        "title": "Localizar o Módulo de Parceiros",
+        "instruction": "No portal de homologação, acesse a seção 'Parceiros' > 'Cadastros Pendentes'.",
+        "expected_action": "Identificar os campos exigidos na aba 'Dados de Compliance / KYC'.",
+        "hint": "Nossa plataforma realiza consulta assíncrona ao bureau de crédito governamental.",
+        "success_criteria": "Dev localiza a tela e identifica os campos críticos de compliance."
+      },
+      {
+        "step_number": 2,
+        "title": "Submeter Cadastro de Teste e Monitorar Webhook",
+        "instruction": "Cadastre um parceiro fictício com CNPJ simulado (gerado pelo validador de teste) e submeta para análise.",
+        "expected_action": "Anotar o ID da proposta gerada e verificar se o evento 'partner.created' foi disparado no painel de eventos.",
+        "hint": "No ambiente de homologação, o validador aceita CNPJs terminados em 0001-99 para aprovação automática.",
+        "success_criteria": "Cadastro submetido e evento de notificação identificado."
+      }
+    ]
+  }
+]

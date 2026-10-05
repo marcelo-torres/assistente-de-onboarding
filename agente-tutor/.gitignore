@@ -1,0 +1,24 @@
+# Ambientes Virtuais
+.venv/
+venv/
+ENV/
+env/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Variáveis locais
+.env
+
+# ADK gerados
+.adk/
+*.log
+
+# IDE
+.idea/
+.vscode/
+*.swp

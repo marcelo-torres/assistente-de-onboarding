@@ -1,0 +1,89 @@
+[
+  {
+    "id": "tech-01",
+    "title": "Investigação Arquitetural do Microsserviço de Documentos",
+    "description": "Explorar o repositório da aplicação de microsserviço de documentos, compreendendo sua arquitetura, tecnologias e motor de armazenamento.",
+    "type": "technical",
+    "target_area": "backend",
+    "compatible_stacks": ["java", "spring", "python", "node", "all"],
+    "min_experience_level": "junior",
+    "estimated_minutes": 35,
+    "prerequisites": ["Acesso ao GitHub/GitLab interno da empresa", "Docker e Git instalados"],
+    "steps": [
+      {
+        "step_number": 1,
+        "title": "Clonar o Repositório e Explorar Estrutura de Diretórios",
+        "instruction": "Acesse a organização da empresa no GitHub e localize o repositório 'ms-documento-api'. Clone o projeto localmente e examine o arquivo de manifesto de dependências (ex: pom.xml ou pyproject.toml ou package.json).",
+        "expected_action": "Informar a linguagem principal, o framework utilizado e as bibliotecas de persistência listadas.",
+        "hint": "O repositório segue o padrão Clean Architecture / Ports and Adapters.",
+        "success_criteria": "Dev clona o repositório e identifica a stack principal do microsserviço."
+      },
+      {
+        "step_number": 2,
+        "title": "Identificação do Motor de Armazenamento e Banco de Dados",
+        "instruction": "Verifique o arquivo 'docker-compose.yml' e as configurações de ambiente (application.yml ou config.py) para identificar quais são os motores de armazenamento utilizados para metadados e arquivos binários.",
+        "expected_action": "Identificar com precisão qual é o banco relacional/documental usado (ex: PostgreSQL 16) e onde os binários/PDFs gerados são gravados (ex: MinIO/S3 Object Storage).",
+        "hint": "Procure pelas variáveis de ambiente DATABASE_URL e S3_ENDPOINT no docker-compose.yml.",
+        "success_criteria": "Dev responde corretamente quais são os motores de armazenamento de metadados e arquivos binários."
+      },
+      {
+        "step_number": 3,
+        "title": "Inicialização dos Serviços Auxiliares e Execução dos Testes",
+        "instruction": "Suba as dependências locais via 'docker compose up -d postgres minio' e execute os testes unitários do projeto.",
+        "expected_action": "Garantir que a suíte de testes de persistência passou com 100% de sucesso e reportar o tempo de execução.",
+        "hint": "Se encontrar falha de conexão com a porta 5432, certifique-se de que não há outra instância local de Postgres rodando na sua máquina.",
+        "success_criteria": "Containers de apoio ativos e suíte de testes concluída com sucesso."
+      }
+    ]
+  },
+  {
+    "id": "tech-02",
+    "title": "Configuração e Execução do Frontend do Portal Web",
+    "description": "Preparar o ambiente local para o portal frontend em Angular/TypeScript, configurando proxy para os microsserviços.",
+    "type": "technical",
+    "target_area": "frontend",
+    "compatible_stacks": ["angular", "typescript", "javascript", "react", "all"],
+    "min_experience_level": "junior",
+    "estimated_minutes": 30,
+    "prerequisites": ["Node.js v20+ e npm instalados"],
+    "steps": [
+      {
+        "step_number": 1,
+        "title": "Instalação de Dependências e Checagem de Versão",
+        "instruction": "Clone o repositório 'portal-web-core', verifique a versão do Node indicada no arquivo .nvmrc e rode 'npm ci'.",
+        "expected_action": "Confirmar a conclusão da instalação sem vulnerabilidades de severidade crítica.",
+        "hint": "Utilizamos Angular 18 com arquitetura de componentes standalone.",
+        "success_criteria": "Dependências instaladas com integridade via lockfile."
+      },
+      {
+        "step_number": 2,
+        "title": "Configuração do Proxy Reverso de Homologação",
+        "instruction": "Abra o arquivo 'proxy.conf.json' e aponte os endpoints '/api/v1/documentos' para o ambiente de homologação ou mock local.",
+        "expected_action": "Iniciar o servidor de desenvolvimento com 'npm start' e acessar http://localhost:4200.",
+        "hint": "O proxy evita problemas de CORS durante o desenvolvimento em máquina local.",
+        "success_criteria": "Aplicação frontend rodando localmente sem erros no console."
+      }
+    ]
+  },
+  {
+    "id": "tech-03",
+    "title": "Padrões de Mensageria e Event-Driven Architecture",
+    "description": "Compreender como os microsserviços se comunicam assincronamente através de tópicos Kafka/RabbitMQ.",
+    "type": "technical",
+    "target_area": "backend",
+    "compatible_stacks": ["java", "python", "node", "all"],
+    "min_experience_level": "pleno",
+    "estimated_minutes": 40,
+    "prerequisites": ["tech-01 concluída"],
+    "steps": [
+      {
+        "step_number": 1,
+        "title": "Mapeamento dos Tópicos e Producers/Consumers",
+        "instruction": "No microsserviço de documentos, localize a camada de infraestrutura de mensageria e liste os tópicos para os quais ele publica eventos quando um documento é aprovado.",
+        "expected_action": "Anotar o schema do evento 'DocumentApprovedEvent' e o nome do tópico Kafka de destino.",
+        "hint": "Utilizamos Avro/JSON Schema armazenado no Schema Registry interno.",
+        "success_criteria": "Dev identifica o evento de saída e o fluxo assíncrono."
+      }
+    ]
+  }
+]
