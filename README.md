@@ -6,3 +6,12 @@ Este repositório contém a arquitetura e implementação dos agentes inteligent
 
 - **[agente-tutor](./agente-tutor)**: Subagente Tutor responsável por acolher o novo desenvolvedor, realizar a entrevista inicial de perfil, propor e gerenciar **missões guiadas de negócio e técnicas**, oferecer suporte em rounds e consultar a base corporativa via A2A.
 - *(Subagente de Conhecimento - Fora do escopo atual, integrado via protocolo A2A)*
+
+
+
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+
+
+.venv\Scripts\adk.exe web ./apps --host 127.0.0.1 --port 8897

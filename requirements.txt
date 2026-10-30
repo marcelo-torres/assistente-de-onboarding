@@ -1,0 +1,4 @@
+# Dependências diretas testadas para os dois provedores e o aprofundamento MCP.
+# As dependências transitivas são resolvidas pelo pip para seu sistema operacional.
+google-adk[mcp]==2.10.0
+google-genai==2.26.0
