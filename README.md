@@ -21,4 +21,8 @@ python scripts/converter_base.py
 # Indexar a base de conhecimento (antes do adk web; rodar de novo sempre que resources/base-conhecimento-md/ mudar)
 python scripts/indexar_base.py
 
+# Avaliar a recuperação com as perguntas de tests/avaliacao/perguntas.yaml
+python scripts/avaliar_rag.py            # busca direta com a pergunta do usuário
+python scripts/avaliar_rag.py --agente   # agente real (usa o LLM; mais lento)
+
 .venv\Scripts\adk.exe web ./apps --host 127.0.0.1 --port 8897

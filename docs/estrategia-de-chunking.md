@@ -32,6 +32,55 @@ Medição com `scripts/avaliar_rag.py` (13 perguntas da base e 3 de IA fora dela
 
 Cuidados ao ler estes números: tamanho e junção foram escolhidos com as mesmas 16 perguntas que os medem, e a margem do limiar é de 0,009 (acerto mais fraco que chega ao agente 0,701; maior nota fora da base 0,692), medida com só 3 perguntas negativas. Vale ampliar o conjunto de perguntas antes de confiar no limiar para novas fontes.
 
+## Reavaliação: as falhas vêm do chunking?
+
+Aplicando o critério de revisão (fim deste documento) às duas perguntas que não chegam ao agente:
+
+| Pergunta | Trecho certo | Nota | Resposta dividida entre trechos? |
+| --- | --- | --- | --- |
+| Documento longo (RAPTOR) | `rag__rag-avancado-e-agentes.md::11`, seção RAPTOR inteira (1.831 caracteres) | 0,650 | Não |
+| Comprovante pedido de novo | `memoria-agentes__...::3`, exemplo de diálogo inteiro (992 caracteres) | 0,665 | Não |
+
+Hipóteses testadas embedando versões alternativas dos trechos com a mesma pergunta:
+
+| Variação | Nota |
+| --- | --- |
+| RAPTOR sem o ruído do diagrama ("C1", "S1", "Resumo de C1-C2") | 0,645 (era 0,650) |
+| Memória só com a parte relevante (RAG stateless) | 0,671 (era 0,665) |
+
+Conclusão: **as falhas não são de chunking.** Nem overlap, nem expansão de vizinhos, nem trechos menores ou mais limpos mudam a nota de forma relevante. A distância está entre o vocabulário da pergunta ("documento muito longo", "pede de novo um comprovante") e o do texto ("RAPTOR", "sumarização hierárquica", "RAG stateless"). A estratégia de chunking fica como está, sem overlap.
+
+### Tentativa do lado da consulta: reescrita no prompt
+
+Em produção, quem chama a busca é o agente, com a consulta que ele mesmo reescreve. Com o prompt original ("consulta autônoma e específica"), o LLM às vezes encurtava a pergunta: "agente de negociação pede comprovante novamente" não passava do limiar.
+
+O prompt do `agente_conhecimento` passou a pedir:
+
+- **Expandir, nunca encurtar:** manter todos os detalhes e acrescentar os termos técnicos do assunto.
+- **Segunda tentativa:** com lista vazia, buscar mais uma vez com outra formulação.
+- **Recusa mais ampla:** dizer "não encontrei" também quando os trechos não respondem à pergunta (para a segunda busca não puxar assunto vizinho).
+
+Medição com o agente real (`python scripts/avaliar_rag.py --agente`, uma rodada de cada; o LLM não é determinístico):
+
+| Métrica | Prompt original | Prompt novo |
+| --- | --- | --- |
+| Trecho certo no top-3 de alguma busca | 11/13 | 11/13 |
+| Respondeu "não encontrei" para pergunta da base | 1/13 | 1/13 |
+| Fora da base: a busca trouxe trechos | 2/3 | 2/3 |
+| Fora da base: respondeu "não encontrei" | 3/3 | 3/3 |
+
+Resultado: sem ganho e sem regressão. O agente passou a expandir as consultas, mas na direção errada nos dois casos que falham:
+
+- **Comprovante:** expandiu como problema de processo de negócio ("falha no sistema de recebimento de documentos"), não de arquitetura de memória.
+- **Documento longo:** expandiu para "documentos extensos com informações de múltiplas seções", sem chegar a "RAPTOR".
+
+A reescrita só ajuda quando o LLM adivinha o conceito técnico, e HyDE ou multi-query dependem do mesmo palpite. O prompt novo foi mantido porque não encurta mais as consultas e a recusa continua firme fora da base (nas perguntas de vLLM e CrewAI, a segunda busca trouxe trechos vizinhos e o agente respondeu "não encontrei").
+
+Caminhos que ainda podem fechar essa distância, sem testes até aqui:
+
+- **Busca híbrida (BM25 + RRF):** não ajuda nestes dois casos, porque as palavras da pergunta não aparecem no texto.
+- **Enriquecer os trechos na indexação:** gerar por LLM perguntas que cada trecho responde e embedar junto. Ataca o problema do lado do documento, no vocabulário do usuário, sem depender do palpite na hora da consulta.
+
 ## O que é overlap
 
 Overlap é repetir o final de um trecho no começo do seguinte. Com trechos de 2.000 caracteres e 10% de overlap, os últimos ~200 caracteres do trecho 4 também abrem o trecho 5.
