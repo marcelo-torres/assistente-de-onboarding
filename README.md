@@ -13,6 +13,11 @@ python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 
+# (Só para reconverter os originais) Converter resources/base-conhecimento/ em markdown.
+# Os HTMLs com conteúdo em JS são lidos num Chromium headless, que o Playwright precisa baixar:
+playwright install chromium
+python scripts/converter_base.py
+
 # Indexar a base de conhecimento (antes do adk web; rodar de novo sempre que resources/base-conhecimento-md/ mudar)
 python scripts/indexar_base.py
 

@@ -6,9 +6,9 @@ Lê `resources/base-conhecimento/` e grava um `.md` por arquivo em
 `resources/base-conhecimento-md/`, sobrescrevendo sem proteção (o git recupera
 correções manuais). O resultado é revisado à mão antes da indexação.
 
-Conversores: markdown (cópia simples), HTML estático (BeautifulSoup) e PDF
-(pypdf, um heading por slide). HTML com conteúdo em JS entra na tarefa 04 e,
-até lá, é ignorado.
+Conversores: markdown (cópia simples), HTML estático (BeautifulSoup), HTML
+com conteúdo em JS (Playwright, ver converter_js.py) e PDF (pypdf, um heading
+por slide). A conversão de HTML com JS exige `playwright install chromium`.
 """
 
 import re
@@ -23,18 +23,10 @@ RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "apps"))
 
 from agente_conhecimento.rag.config import PASTA_MARKDOWN as DESTINO  # noqa: E402
+from converter_js import PAGINAS_COM_JS, converter_html_com_js  # noqa: E402
+from texto_markdown import adicionar, escapar_cerquilha, normalizar, tabela  # noqa: E402
 
 ORIGINAIS = RAIZ / "resources" / "base-conhecimento"
-
-# Estes HTMLs guardam o conteúdo em objetos JavaScript: um parser comum só vê
-# a casca da página. Ficam para o conversor com Playwright (tarefa 04).
-HTML_COM_CONTEUDO_EM_JS = {
-    "rag__agentic-retrieval-e-memoria.html",
-    "rag__masterclass-rag-e-memoria.html",
-    "rag__rag-avancado-e-agentes.html",
-    "memoria-agentes__the-memory-arquitetura-stateful.html",
-    "fundamentos-agentes__ecossistema-adk-e-economia-de-tokens.html",
-}
 
 # Navegação, rodapé e elementos interativos não são conteúdo.
 _DESCARTAR = [
@@ -70,8 +62,9 @@ def converter_html_estatico(html: str) -> str:
     for tag in sopa.find_all(_DESCARTAR):
         tag.decompose()
     for header in sopa.find_all("header"):
-        # Alguns headers são só a barra do topo; outros trazem o H1 da página.
-        if not header.find("h1"):
+        # Alguns headers são só a barra do topo; outros abrem a página ou a
+        # seção com o heading dela.
+        if not header.find(list(_HEADINGS)):
             header.decompose()
 
     blocos = [f"# {titulo}"]
@@ -83,9 +76,9 @@ def _renderizar(no: Tag, blocos: list[str]) -> None:
     inline: list[str] = []
 
     def fechar_paragrafo() -> None:
-        texto = _normalizar("".join(inline))
+        texto = normalizar("".join(inline))
         if texto:
-            blocos.append(_escapar_cerquilha(texto))
+            blocos.append(escapar_cerquilha(texto))
         inline.clear()
 
     for filho in no.children:
@@ -102,27 +95,17 @@ def _renderizar(no: Tag, blocos: list[str]) -> None:
         fechar_paragrafo()
         if filho.name in _HEADINGS:
             nivel = max(2, int(filho.name[1]))
-            _adicionar(blocos, f"{'#' * nivel} {_texto(filho)}" if _texto(filho) else "")
+            adicionar(blocos, f"{'#' * nivel} {_texto(filho)}" if _texto(filho) else "")
         elif filho.name in ("ul", "ol"):
-            _adicionar(blocos, _lista(filho))
+            adicionar(blocos, _lista(filho))
         elif filho.name == "table":
-            _adicionar(blocos, _tabela(filho))
+            adicionar(blocos, _tabela(filho))
         elif filho.name == "pre":
             codigo = filho.get_text().strip("\n")
-            _adicionar(blocos, f"```\n{codigo}\n```" if codigo.strip() else "")
+            adicionar(blocos, f"```\n{codigo}\n```" if codigo.strip() else "")
         else:
             _renderizar(filho, blocos)
     fechar_paragrafo()
-
-
-def _escapar_cerquilha(texto: str) -> str:
-    """Texto que começa com "#" (ex.: comentário de código) não é heading."""
-    return re.sub(r"^#", r"\\#", texto)
-
-
-def _adicionar(blocos: list[str], bloco: str) -> None:
-    if bloco:
-        blocos.append(bloco)
 
 
 def _lista(lista: Tag) -> str:
@@ -132,30 +115,15 @@ def _lista(lista: Tag) -> str:
     return "\n".join(f"- {item}" for item in itens)
 
 
-def _tabela(tabela: Tag) -> str:
-    linhas = [
-        [_texto(celula).replace("|", "\\|") for celula in tr.find_all(["th", "td"])]
-        for tr in tabela.find_all("tr")
-    ]
-    linhas = [linha for linha in linhas if any(linha)]
-    if not linhas:
-        return ""
-    largura = max(len(linha) for linha in linhas)
-    linhas = [linha + [""] * (largura - len(linha)) for linha in linhas]
-    cabecalho, *corpo = linhas
-    saida = [cabecalho, ["---"] * largura, *corpo]
-    return "\n".join(f"| {' | '.join(linha)} |" for linha in saida)
+def _tabela(elemento: Tag) -> str:
+    return tabela([
+        [_texto(celula) for celula in tr.find_all(["th", "td"])]
+        for tr in elemento.find_all("tr")
+    ])
 
 
 def _texto(no) -> str:
-    return _normalizar(no.get_text(" ") if isinstance(no, Tag) else str(no))
-
-
-def _normalizar(texto: str) -> str:
-    texto = re.sub(r"\s+", " ", texto)
-    # Os espaços em volta de tags inline não podem ficar antes de pontuação.
-    texto = re.sub(r" ([.,;:!?)\]])", r"\1", texto)
-    return re.sub(r"([(\[]) ", r"\1", texto).strip()
+    return normalizar(no.get_text(" ") if isinstance(no, Tag) else str(no))
 
 
 def converter_paginas_pdf(paginas: list[str]) -> str:
@@ -181,7 +149,7 @@ def converter_paginas_pdf(paginas: list[str]) -> str:
         )
         titulo = linhas[indice_titulo] if indice_titulo is not None else f"Slide {numero}"
         corpo = [
-            _escapar_cerquilha(_corrigir_letras_espacadas(linha))
+            escapar_cerquilha(_corrigir_letras_espacadas(linha))
             for i, linha in enumerate(linhas) if i != indice_titulo
         ]
         slides.append((numero, titulo, corpo))
@@ -191,7 +159,7 @@ def converter_paginas_pdf(paginas: list[str]) -> str:
     blocos = [f"# {slides[0][1]}"]
     for numero, titulo, corpo in slides:
         blocos.append(f"## Slide {numero}: {titulo}")
-        _adicionar(blocos, "\n".join(corpo))
+        adicionar(blocos, "\n".join(corpo))
     return "\n\n".join(blocos) + "\n"
 
 
@@ -275,9 +243,9 @@ def _capitalizar_frase(texto: str) -> str:
     return " ".join(palavras)
 
 
-def converter_html(arquivo: Path) -> str | None:
-    if arquivo.name in HTML_COM_CONTEUDO_EM_JS:
-        return None
+def converter_html(arquivo: Path) -> str:
+    if arquivo.name in PAGINAS_COM_JS:
+        return converter_html_com_js(arquivo, converter_html_estatico)
     return converter_html_estatico(arquivo.read_text(encoding="utf-8"))
 
 
@@ -300,9 +268,6 @@ def main() -> None:
             print(f"Ignorado (tipo ainda não suportado): {arquivo.name}")
             continue
         markdown = conversor(arquivo)
-        if markdown is None:
-            print(f"Ignorado (conteúdo em JS, tarefa 04): {arquivo.name}")
-            continue
         destino = DESTINO / f"{arquivo.stem}.md"
         destino.write_text(markdown, encoding="utf-8")
         print(f"Convertido: {arquivo.name} -> {destino.relative_to(RAIZ)}")

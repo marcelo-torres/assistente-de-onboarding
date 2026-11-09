@@ -100,3 +100,13 @@ def test_lista_numerada_ignora_itens_vazios_sem_pular_numero():
     html = "<html><head><title>T</title></head><body><ol><li>a</li><li> </li><li>c</li></ol></body></html>"
 
     assert converter_html_estatico(html) == "# T\n\n1. a\n2. c\n"
+
+
+def test_header_com_heading_de_secao_e_mantido():
+    html = """<html><head><title>T</title></head><body>
+      <section><header><h2>O Paradoxo do Agente</h2><p>Intro da seção.</p></header><p>Corpo.</p></section>
+    </body></html>"""
+
+    assert converter_html_estatico(html) == (
+        "# T\n\n## O Paradoxo do Agente\n\nIntro da seção.\n\nCorpo.\n"
+    )
