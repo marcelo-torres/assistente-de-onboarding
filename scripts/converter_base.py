@@ -6,8 +6,9 @@ Lê `resources/base-conhecimento/` e grava um `.md` por arquivo em
 `resources/base-conhecimento-md/`, sobrescrevendo sem proteção (o git recupera
 correções manuais). O resultado é revisado à mão antes da indexação.
 
-Conversores: markdown (cópia simples) e HTML estático (BeautifulSoup). PDF e
-HTML com conteúdo em JS entram nas tarefas seguintes e, até lá, são ignorados.
+Conversores: markdown (cópia simples), HTML estático (BeautifulSoup) e PDF
+(pypdf, um heading por slide). HTML com conteúdo em JS entra na tarefa 04 e,
+até lá, é ignorado.
 """
 
 import re
@@ -16,6 +17,7 @@ from pathlib import Path
 
 from bs4 import BeautifulSoup, NavigableString, Tag
 from bs4.element import PreformattedString
+from pypdf import PdfReader
 
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "apps"))
@@ -83,8 +85,7 @@ def _renderizar(no: Tag, blocos: list[str]) -> None:
     def fechar_paragrafo() -> None:
         texto = _normalizar("".join(inline))
         if texto:
-            # Texto que começa com "#" (ex.: comentário de código) não é heading.
-            blocos.append(re.sub(r"^#", r"\\#", texto))
+            blocos.append(_escapar_cerquilha(texto))
         inline.clear()
 
     for filho in no.children:
@@ -112,6 +113,11 @@ def _renderizar(no: Tag, blocos: list[str]) -> None:
         else:
             _renderizar(filho, blocos)
     fechar_paragrafo()
+
+
+def _escapar_cerquilha(texto: str) -> str:
+    """Texto que começa com "#" (ex.: comentário de código) não é heading."""
+    return re.sub(r"^#", r"\\#", texto)
 
 
 def _adicionar(blocos: list[str], bloco: str) -> None:
@@ -152,15 +158,137 @@ def _normalizar(texto: str) -> str:
     return re.sub(r"([(\[]) ", r"\1", texto).strip()
 
 
+def converter_paginas_pdf(paginas: list[str]) -> str:
+    """Converte o texto das páginas de um deck em markdown, um heading por slide.
+
+    O título de cada slide é a primeira linha com minúsculas; sobretítulos em
+    maiúsculas ficam no corpo. O H1 do arquivo é o título do primeiro slide.
+    """
+    paginas_em_linhas = [_juntar_linhas_quebradas(pagina) for pagina in paginas]
+    repetidas = _linhas_repetidas(paginas_em_linhas)
+
+    slides = []
+    for numero, linhas in enumerate(paginas_em_linhas, 1):
+        linhas = [
+            linha for linha in linhas
+            if _sem_numeros(linha) not in repetidas and not _numero_de_pagina(linha)
+        ]
+        # Título: primeira linha com minúsculas que não é sobretítulo espaçado.
+        indice_titulo = next(
+            (i for i, linha in enumerate(linhas)
+             if _tem_minuscula(linha) and not _letras_espacadas(linha)),
+            None,
+        )
+        titulo = linhas[indice_titulo] if indice_titulo is not None else f"Slide {numero}"
+        corpo = [
+            _escapar_cerquilha(_corrigir_letras_espacadas(linha))
+            for i, linha in enumerate(linhas) if i != indice_titulo
+        ]
+        slides.append((numero, titulo, corpo))
+
+    if not slides:
+        return ""
+    blocos = [f"# {slides[0][1]}"]
+    for numero, titulo, corpo in slides:
+        blocos.append(f"## Slide {numero}: {titulo}")
+        _adicionar(blocos, "\n".join(corpo))
+    return "\n\n".join(blocos) + "\n"
+
+
+def _juntar_linhas_quebradas(pagina: str) -> list[str]:
+    """O pypdf marca a quebra de linha visual com um espaço no fim da linha.
+
+    Código também sai com espaço no fim, então linhas de código (comentário,
+    flag, continuação com barra) e início de bullet ou de linha indentada
+    nunca são juntados.
+    """
+    linhas: list[str] = []
+    continua = False
+    for linha in pagina.splitlines():
+        if continua and linhas and not linha.startswith(("•", "#", "-", " ")):
+            linhas[-1] += " " + linha.strip()
+        else:
+            linhas.append(linha.strip())
+        atual = linhas[-1] if linhas else ""
+        continua = (
+            linha.endswith(" ")
+            and not atual.startswith(("#", "-"))
+            and not atual.endswith("\\")
+        )
+    return [linha for linha in linhas if linha]
+
+
+def _sem_numeros(linha: str) -> str:
+    return re.sub(r"\d+", "", linha).strip()
+
+
+def _linhas_repetidas(paginas: list[list[str]]) -> set[str]:
+    """Cabeçalhos e rodapés: mesmo texto (sem números) em mais da metade das páginas.
+
+    Com menos de 3 páginas não dá para distinguir rodapé de conteúdo.
+    """
+    if len(paginas) < 3:
+        return set()
+    contagem: dict[str, int] = {}
+    for linhas in paginas:
+        for chave in {_sem_numeros(linha) for linha in linhas}:
+            contagem[chave] = contagem.get(chave, 0) + 1
+    return {chave for chave, n in contagem.items() if chave and n > len(paginas) / 2}
+
+
+def _numero_de_pagina(linha: str) -> bool:
+    return re.fullmatch(r"\d{1,2}", linha) is not None
+
+
+def _tem_minuscula(texto: str) -> bool:
+    return any(c.islower() for c in texto)
+
+
+def _corrigir_letras_espacadas(linha: str) -> str:
+    """'A T O  1  ·  A  I D E I A' -> 'Ato 1 · A ideia'.
+
+    Títulos de slide com espaçamento entre letras saem do PDF com um espaço
+    entre letras e dois entre palavras.
+    """
+    if not _letras_espacadas(linha):
+        return linha
+    palavras = [p.replace(" ", "") for p in re.split(r"\s{2,}", linha)]
+    frase = re.sub(r"\s*—\s*", " — ", " ".join(palavras))
+    segmentos = frase.split(" · ")
+    return " · ".join(_capitalizar_frase(segmento) for segmento in segmentos)
+
+
+def _letras_espacadas(linha: str) -> bool:
+    tokens = linha.split()
+    return len(tokens) >= 4 and sum(len(t) == 1 for t in tokens) >= 0.8 * len(tokens)
+
+
+# Siglas que aparecem nos sobretítulos espaçados dos decks; o resto vira minúscula.
+_SIGLAS = {"ADK": "ADK", "BV": "BV", "NEMO": "NeMo"}
+
+
+def _capitalizar_frase(texto: str) -> str:
+    """'ATO 1 · A IDEIA NO ADK' -> 'Ato 1 · A ideia no ADK'."""
+    palavras = [_SIGLAS.get(palavra, palavra.lower()) for palavra in texto.split(" ")]
+    if palavras and palavras[0] not in _SIGLAS.values():
+        palavras[0] = palavras[0].capitalize()
+    return " ".join(palavras)
+
+
 def converter_html(arquivo: Path) -> str | None:
     if arquivo.name in HTML_COM_CONTEUDO_EM_JS:
         return None
     return converter_html_estatico(arquivo.read_text(encoding="utf-8"))
 
 
+def converter_pdf(arquivo: Path) -> str:
+    return converter_paginas_pdf([pagina.extract_text() for pagina in PdfReader(arquivo).pages])
+
+
 CONVERSORES = {
     ".md": converter_markdown,
     ".html": converter_html,
+    ".pdf": converter_pdf,
 }
 
 

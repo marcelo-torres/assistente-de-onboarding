@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Os 2 `.md` existem na pasta de markdown revisado, com um heading por slide e sem títulos com letras espaçadas
+- [x] Os 2 `.md` existem na pasta de markdown revisado, com um heading por slide e sem títulos com letras espaçadas
 - [ ] O autor revisou cada `.md` lado a lado com o original
-- [ ] `pypdf` está no `requirements.txt`
-- [ ] Após reindexar, a coleção tem trechos dos 2 arquivos
-- [ ] No `adk web`, uma pergunta sobre guardrails cita o deck de guardrails
+- [x] `pypdf` está no `requirements.txt`
+- [x] Após reindexar, a coleção tem trechos dos 2 arquivos
+- [x] No `adk web`, uma pergunta sobre guardrails cita o deck de guardrails
