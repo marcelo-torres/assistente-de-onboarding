@@ -6,7 +6,7 @@ Complementa a Fase 2 de [`plano-rag-base-conhecimento.md`](plano-rag-base-conhec
 
 ## Estratégia adotada
 
-- **Corte hierárquico por heading.** Cada seção do markdown vira um trecho, de 1.200 a 3.200 caracteres (cerca de 300 a 800 tokens, a ~4 caracteres por token, sem tokenizador).
+- **Corte hierárquico por heading.** Cada seção do markdown vira um trecho de até 3.200 caracteres, contando o cabeçalho contextual (cerca de 800 tokens, a ~4 caracteres por token, sem tokenizador). Não há tamanho mínimo: seções pequenas ficam inteiras, porque juntá-las misturaria assuntos e quebraria a citação de seção (no `rag__estrategias-de-chunking`, todas as seções têm menos de 1.200 caracteres).
 - **Subdivisão por parágrafo.** Seções acima de 3.200 caracteres são divididas entre parágrafos, nunca no meio de uma frase.
 - **Sem overlap.** Nenhum texto é repetido entre trechos vizinhos.
 - **Cabeçalho contextual.** Cada trecho começa com `"{titulo} > {secao}"`, e esse é o texto embedado e guardado no Chroma.

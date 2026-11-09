@@ -13,5 +13,7 @@ python -m venv .venv
 .venv\Scripts\activate
 pip install -r requirements.txt
 
+# Indexar a base de conhecimento (antes do adk web; rodar de novo sempre que resources/base-conhecimento-md/ mudar)
+python scripts/indexar_base.py
 
 .venv\Scripts\adk.exe web ./apps --host 127.0.0.1 --port 8897
