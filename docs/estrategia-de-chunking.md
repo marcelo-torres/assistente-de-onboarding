@@ -6,11 +6,31 @@ Complementa a Fase 2 de [`plano-rag-base-conhecimento.md`](plano-rag-base-conhec
 
 ## Estratégia adotada
 
-- **Corte hierárquico por heading.** Cada seção do markdown vira um trecho de até 3.200 caracteres, contando o cabeçalho contextual (cerca de 800 tokens, a ~4 caracteres por token, sem tokenizador). Não há tamanho mínimo: seções pequenas ficam inteiras, porque juntá-las misturaria assuntos e quebraria a citação de seção (no `rag__estrategias-de-chunking`, todas as seções têm menos de 1.200 caracteres).
-- **Subdivisão por parágrafo.** Seções acima de 3.200 caracteres são divididas entre parágrafos, nunca no meio de uma frase.
+- **Corte hierárquico por heading.** Trechos de até 2.000 caracteres, contando o cabeçalho contextual (cerca de 500 tokens, a ~4 caracteres por token, sem tokenizador).
+- **Seção com subseções vira um trecho só quando cabe.** Se a seção, somada a todas as subseções, cabe no limite, vira um trecho com os subtítulos no texto e cita a seção pai. Se não cabe, o corpo próprio vira um trecho e cada subseção é avaliada do mesmo jeito. Seções vizinhas sem relação de pai e filho nunca são juntadas, então a citação continua apontando para um assunto só.
+- **Subdivisão por parágrafo.** Um corpo acima do limite é dividido entre parágrafos, nunca no meio de uma frase.
 - **Sem overlap.** Nenhum texto é repetido entre trechos vizinhos.
 - **Cabeçalho contextual.** Cada trecho começa com `"{titulo} > {secao}"`, e esse é o texto embedado e guardado no Chroma.
 - **Metadados:** `fonte`, `tema`, `titulo`, `secao` e `indice_chunk` (ver a tabela da Fase 2 no plano).
+
+## Calibração (tarefa 05)
+
+A primeira versão tinha só o limite máximo (3.200) e nenhuma junção, porque no primeiro arquivo da base as seções eram pequenas mas autossuficientes. Com os 13 arquivos, o `fundamentos-agentes__ecossistema-adk-e-economia-de-tokens` gerou centenas de seções minúsculas (ex.: "#### Orquestração" com três palavras), com embedding fraco: "quais são os níveis de agentes de IA?" não achava a seção "Níveis de Agentes".
+
+Medição com `scripts/avaliar_rag.py` (13 perguntas da base e 3 de IA fora dela, em `tests/avaliacao/perguntas.yaml`):
+
+| Configuração | Trechos | hit@3 pela tool (limiar 0,70) | hit@3 sem limiar | Falsos positivos | Pior acerto (sem limiar) | Maior nota fora da base |
+| --- | --- | --- | --- | --- | --- | --- |
+| Sem junção, até 3.200 | 1.077 | 85% | 92% | 1/3 | 0,665 | 0,703 |
+| Com junção, até 3.200 | 569 | 85% | 92% | 0/3 | 0,626 | 0,692 |
+| **Com junção, até 2.000** (adotada) | 644 | 85% | 92% | 0/3 | 0,665 | 0,692 |
+
+"hit@3 pela tool" é o que chega ao agente: o arquivo certo entre os 3 primeiros e acima do limiar. Na configuração adotada, o hit@3 estrito (só o arquivo-alvo, sem os aceitos) também é 92%. Duas perguntas não chegam ao agente:
+
+- **Documentos longos (RAPTOR):** erra nas três configurações; traz trechos sobre chunking e contexto longo de outros arquivos.
+- **Comprovante repetido (memória do agente):** acha o arquivo certo, mas com nota 0,665, abaixo do limiar.
+
+Cuidados ao ler estes números: tamanho e junção foram escolhidos com as mesmas 16 perguntas que os medem, e a margem do limiar é de 0,009 (acerto mais fraco que chega ao agente 0,701; maior nota fora da base 0,692), medida com só 3 perguntas negativas. Vale ampliar o conjunto de perguntas antes de confiar no limiar para novas fontes.
 
 ## O que é overlap
 

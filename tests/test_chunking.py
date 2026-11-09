@@ -15,7 +15,8 @@ O gestor aprova em até dois dias.
 
 
 def test_cada_secao_vira_um_trecho_com_caminho_de_headings_e_metadados():
-    trechos = cortar_em_trechos(MARKDOWN, fonte="acessos__guia.md")
+    # Limite em que "Solicitação" e "Aprovação" juntas não cabem num trecho só.
+    trechos = cortar_em_trechos(MARKDOWN, fonte="acessos__guia.md", tamanho_maximo=90)
 
     assert [t.secao for t in trechos] == ["", "Solicitação", "Solicitação > Aprovação"]
     aprovacao = trechos[2]
@@ -54,3 +55,31 @@ def test_cerquilha_dentro_de_bloco_de_codigo_nao_abre_secao():
 
     assert [t.secao for t in trechos] == ["Exemplo", "Fim"]
     assert "# comentario" in trechos[0].texto
+
+
+def test_secao_com_subsecoes_que_cabem_no_limite_vira_um_trecho_so():
+    markdown = (
+        "# Agentes\n\nIntro.\n\n"
+        "## Níveis\n\nDa simplicidade à complexidade.\n\n"
+        "### Básico\n\nPrompt e resposta.\n\n"
+        "#### Exemplo\n\nChatbot de FAQ.\n\n"
+        "### Avançado\n\nMemória e ferramentas.\n\n"
+        "## Custos\n\nTokens custam.\n"
+    )
+
+    trechos = cortar_em_trechos(markdown, fonte="agentes.md")
+
+    assert [t.secao for t in trechos] == ["", "Níveis", "Custos"]
+    assert trechos[1].texto == (
+        "Agentes > Níveis\n\nDa simplicidade à complexidade.\n\n"
+        "### Básico\n\nPrompt e resposta.\n\n#### Exemplo\n\nChatbot de FAQ.\n\n"
+        "### Avançado\n\nMemória e ferramentas."
+    )
+
+
+def test_secao_que_nao_cabe_mantem_subsecoes_separadas():
+    markdown = "# Doc\n\n## Grande\n\n" + "x" * 150 + "\n\n### Filha\n\n" + "y" * 100 + "\n"
+
+    trechos = cortar_em_trechos(markdown, fonte="doc.md", tamanho_maximo=200)
+
+    assert [t.secao for t in trechos] == ["Grande", "Grande > Filha"]

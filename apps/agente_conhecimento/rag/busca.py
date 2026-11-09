@@ -25,6 +25,13 @@ def buscar_base_conhecimento(pergunta: str) -> list[dict] | str:
         Os trechos mais relevantes [{texto, fonte, secao, score}], do mais
         ao menos relevante. Lista vazia quando nada relevante foi encontrado.
     """
+    return buscar(pergunta)
+
+
+def buscar(
+    pergunta: str, limiar: float | None = LIMIAR_SIMILARIDADE, top_k: int = TOP_K
+) -> list[dict] | str:
+    """Busca com limiar e top_k explícitos; limiar=None devolve as notas brutas (avaliação)."""
     global _colecao
     if _colecao is None:
         _colecao = abrir_colecao_existente()
@@ -33,7 +40,7 @@ def buscar_base_conhecimento(pergunta: str) -> list[dict] | str:
 
     resultado = _colecao.query(
         query_embeddings=[embedar_consulta(pergunta)],
-        n_results=TOP_K,
+        n_results=top_k,
         include=["documents", "metadatas", "distances"],
     )
     trechos = []
@@ -41,7 +48,7 @@ def buscar_base_conhecimento(pergunta: str) -> list[dict] | str:
         resultado["documents"][0], resultado["metadatas"][0], resultado["distances"][0]
     ):
         score = 1 - distancia
-        if score >= LIMIAR_SIMILARIDADE:
+        if limiar is None or score >= limiar:
             trechos.append(
                 {
                     "texto": texto,

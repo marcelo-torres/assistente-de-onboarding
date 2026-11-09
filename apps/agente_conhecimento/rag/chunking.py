@@ -1,7 +1,7 @@
 """Corte hierárquico do markdown em trechos, por heading."""
 
 import re
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from dataclasses import dataclass
 
 from .config import TAMANHO_MAXIMO_TRECHO
@@ -35,20 +35,25 @@ class Trecho:
 def cortar_em_trechos(
     markdown: str, fonte: str, tamanho_maximo: int = TAMANHO_MAXIMO_TRECHO
 ) -> list[Trecho]:
-    """Corta o markdown em um trecho por seção.
+    """Corta o markdown em trechos pela hierarquia de headings.
 
     O título é o primeiro H1; a seção é o caminho de headings abaixo dele
-    (ex.: "Solicitação > Aprovação"). O texto de cada trecho começa com o
-    cabeçalho contextual "titulo > secao" e tem no máximo `tamanho_maximo`
-    caracteres: seções maiores são subdivididas por parágrafo, sem overlap.
+    (ex.: "Solicitação > Aprovação"). Uma seção que cabe inteira no limite,
+    junto com as subseções, vira um trecho só (subseções minúsculas sozinhas
+    geram embeddings fracos). Senão, o corpo dela vira um trecho e cada
+    subseção é avaliada do mesmo jeito. O texto começa com o cabeçalho
+    contextual "titulo > secao" e tem no máximo `tamanho_maximo` caracteres:
+    corpos maiores são subdivididos por parágrafo, sem overlap.
     """
     titulo = _titulo(markdown, fonte)
     tema = fonte.split("__", 1)[0] if "__" in fonte else ""
 
-    secoes = _secoes(markdown, titulo)
+    def cabe(secao: str, corpo: str) -> bool:
+        return len(_cabecalho(titulo, secao)) + 2 + len(corpo) <= tamanho_maximo
+
     trechos = []
-    for secao, corpo in secoes:
-        cabecalho = f"{titulo} > {secao}" if secao else titulo
+    for secao, corpo in _agrupar(_secoes(markdown, titulo), cabe):
+        cabecalho = _cabecalho(titulo, secao)
         espaco_para_corpo = tamanho_maximo - len(cabecalho) - 2
         if espaco_para_corpo <= 0:
             raise ValueError(f"Cabeçalho maior que o limite do trecho em {fonte}: {cabecalho!r}")
@@ -113,17 +118,36 @@ def _titulo(markdown: str, fonte: str) -> str:
     return fonte.removesuffix(".md")
 
 
-def _secoes(markdown: str, titulo: str) -> list[tuple[str, str]]:
-    """Devolve (caminho da seção, corpo) para cada seção com conteúdo."""
-    secoes = []
+@dataclass(frozen=True)
+class _Secao:
+    nivel: int
+    nome: str
+    caminho: str
+    corpo: str
+
+
+# A introdução (texto antes do primeiro heading) não tem subseções.
+_NIVEL_INTRODUCAO = 7
+
+
+def _cabecalho(titulo: str, secao: str) -> str:
+    return f"{titulo} > {secao}" if secao else titulo
+
+
+def _secoes(markdown: str, titulo: str) -> list[_Secao]:
+    """Todas as seções em ordem, inclusive as sem corpo (podem ter subseções)."""
+    secoes: list[_Secao] = []
     caminho: list[tuple[int, str]] = []
     linhas: list[str] = []
     titulo_visto = False
 
     def fechar_secao():
         corpo = "\n".join(linhas).strip()
-        if corpo:
-            secoes.append((" > ".join(nome for _, nome in caminho), corpo))
+        if caminho:
+            nivel, nome = caminho[-1]
+            secoes.append(_Secao(nivel, nome, " > ".join(n for _, n in caminho), corpo))
+        elif corpo:
+            secoes.append(_Secao(_NIVEL_INTRODUCAO, "", "", corpo))
         linhas.clear()
 
     for linha, casamento in _linhas(markdown):
@@ -141,3 +165,28 @@ def _secoes(markdown: str, titulo: str) -> list[tuple[str, str]]:
         caminho.append((nivel, nome))
     fechar_secao()
     return secoes
+
+
+def _agrupar(secoes: list[_Secao], cabe: Callable[[str, str], bool]) -> list[tuple[str, str]]:
+    """(caminho, corpo) dos trechos: seção + subseções juntas quando cabem."""
+    grupos = []
+    i = 0
+    while i < len(secoes):
+        secao = secoes[i]
+        fim = i + 1
+        while fim < len(secoes) and secoes[fim].nivel > secao.nivel:
+            fim += 1
+        if fim > i + 1:
+            partes = [secao.corpo] + [
+                f"{'#' * sub.nivel} {sub.nome}" + (f"\n\n{sub.corpo}" if sub.corpo else "")
+                for sub in secoes[i + 1 : fim]
+            ]
+            corpo = "\n\n".join(parte for parte in partes if parte)
+            if cabe(secao.caminho, corpo):
+                grupos.append((secao.caminho, corpo))
+                i = fim
+                continue
+        if secao.corpo:
+            grupos.append((secao.caminho, secao.corpo))
+        i += 1
+    return grupos

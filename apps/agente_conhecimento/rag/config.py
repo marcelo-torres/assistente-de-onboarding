@@ -10,13 +10,18 @@ PASTA_CHROMA = RAIZ_DO_PROJETO / "data" / "chroma"
 NOME_COLECAO = "base_conhecimento"
 MODELO_EMBEDDING = "gemini-embedding-001"
 
-# Limite do trecho em caracteres, incluindo o cabeçalho contextual (~800 tokens).
-# Não há tamanho mínimo: juntar seções pequenas misturaria assuntos e quebraria a
-# citação de seção. Ver docs/estrategia-de-chunking.md.
-TAMANHO_MAXIMO_TRECHO = 3200
+# Calibrados na tarefa 05 com scripts/avaliar_rag.py (13 arquivos, 16 perguntas de
+# tests/avaliacao/perguntas.yaml). Ver docs/estrategia-de-chunking.md.
+
+# Limite do trecho em caracteres, incluindo o cabeçalho contextual (~500 tokens).
+# Uma seção que cabe inteira, com as subseções, vira um trecho só.
+# Com 2.000 e 3.200 os acertos e falsos positivos empatam; 2.000 tem notas um pouco
+# melhores no acerto mais fraco (0,665 contra 0,626), diferença pequena para 13 perguntas.
+TAMANHO_MAXIMO_TRECHO = 2000
 
 TOP_K = 5
-# Provisório: calibrado na tarefa 05 (avaliação). Medição inicial com o arquivo
-# rag__estrategias-de-chunking: perguntas da base com melhor score de 0,74 a 0,80;
-# perguntas de IA fora da base até 0,66; fora do domínio até 0,57.
+# Mantido em 0,70: hit@3 pela tool 85% (11/13) e 0/3 falsos positivos. A margem é
+# de 0,009 (acerto mais fraco acima do limiar 0,701; maior nota fora da base 0,692),
+# medida com só 3 perguntas negativas. Baixar para 0,69 cria falsos positivos;
+# subir para 0,71 perde acertos. Rode a avaliação de novo sempre que a base mudar.
 LIMIAR_SIMILARIDADE = 0.70

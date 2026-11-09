@@ -10,22 +10,13 @@ como faz o `adk web`.
 import sys
 from pathlib import Path
 
-from dotenv import load_dotenv
-
 RAIZ = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(RAIZ / "apps"))
 
 from agente_conhecimento.rag.config import PASTA_MARKDOWN  # noqa: E402
 from agente_conhecimento.rag.embeddings import embedar_documentos  # noqa: E402
 from agente_conhecimento.rag.indice import abrir_ou_criar_colecao, sincronizar  # noqa: E402
-
-
-def carregar_env() -> None:
-    pasta = RAIZ / "apps" / "agente_conhecimento"
-    for candidata in [pasta, *pasta.parents]:
-        if (candidata / ".env").is_file():
-            load_dotenv(candidata / ".env", override=False)
-            return
+from ambiente import carregar_env  # noqa: E402
 
 
 def main() -> None:

@@ -1,0 +1,63 @@
+# Perguntas de avaliação da recuperação (tarefa 05). Revisadas pelo autor.
+#
+# dentro_da_base: uma pergunta por arquivo da base.
+#   alvo:    o arquivo que a pergunta foi escrita para testar.
+#   aceitos: outros arquivos que também respondem bem (a pergunta acerta se
+#            qualquer um deles aparecer no top-3). Remova se preferir a métrica
+#            estrita "só o alvo conta".
+# fora_da_base: assuntos de IA próximos do domínio que nenhum arquivo cobre
+#   (conferido por busca de termo nos 13 .md). Nenhum resultado pode passar do limiar.
+#
+# As perguntas tentam soar como um desenvolvedor novo, evitando copiar os títulos
+# das seções; reescreva no seu vocabulário o que soar artificial.
+
+dentro_da_base:
+  - pergunta: Como devo quebrar uma planilha grande em pedaços para o RAG sem perder o que cada coluna significa?
+    alvo: rag__estrategias-de-chunking.md
+
+  - pergunta: Como o computador percebe que "cão" e "cachorro" querem dizer quase a mesma coisa?
+    alvo: embeddings__embeddings-do-zero.md
+
+  - pergunta: Por que, quando filtro por metadado na busca do Chroma, às vezes recebo menos resultados do que pedi?
+    alvo: vector-stores__indices-ann-e-vector-stores.md
+
+  - pergunta: Criei o índice no Vertex AI Vector Search, mas ainda não consigo consultar. O que está faltando?
+    alvo: vector-stores__anatomia-vertex-ai-vector-search.md
+    aceitos: [rag__deck-rag-na-agent-platform.md]
+
+  - pergunta: Por que a busca por similaridade erra quando procuro um número de contrato específico?
+    alvo: busca-hibrida__bm25-e-rrf.md
+    aceitos: [rag__rag-avancado-e-agentes.md, rag__masterclass-rag-e-memoria.md]
+
+  - pergunta: Quais projetos a turma 2 desenvolveu ao longo do programa de agentes?
+    alvo: programa__jornada-agentes-ia-visao-geral.md
+
+  - pergunta: Como uso o Model Armor para barrar prompt injection num agente feito com ADK?
+    alvo: guardrails__deck-guardrails-descida-da-serra.md
+    aceitos: [fundamentos-agentes__ecossistema-adk-e-economia-de-tokens.md]
+
+  - pergunta: Na hora de criar o índice no Vector Search, quando escolho Tree-AH e quando escolho força bruta?
+    alvo: rag__deck-rag-na-agent-platform.md
+    aceitos: [vector-stores__indices-ann-e-vector-stores.md]
+
+  - pergunta: Quando vale a pena deixar o próprio agente decidir se precisa ou não buscar documentos?
+    alvo: rag__agentic-retrieval-e-memoria.md
+
+  - pergunta: Qual a diferença entre o que o modelo já sabe pelos pesos e a memória externa de um agente?
+    alvo: rag__masterclass-rag-e-memoria.md
+    aceitos: [rag__agentic-retrieval-e-memoria.md]
+
+  - pergunta: Como responder perguntas gerais sobre um documento muito longo, que nenhum trecho sozinho cobre?
+    alvo: rag__rag-avancado-e-agentes.md
+
+  - pergunta: Por que o agente de negociação pede de novo um comprovante que o cliente já enviou na conversa?
+    alvo: memoria-agentes__the-memory-arquitetura-stateful.md
+
+  - pergunta: Como estimar quanto vou gastar em tokens com o Gemini e o que fazer para gastar menos?
+    alvo: fundamentos-agentes__ecossistema-adk-e-economia-de-tokens.md
+
+fora_da_base:
+  - pergunta: Como servir um modelo open source em produção com vLLM?
+  - pergunta: Como funciona o RLHF no treinamento de um LLM?
+  # A mais difícil: orquestração multiagente está na base, mas CrewAI e AutoGen não.
+  - pergunta: Qual a diferença entre CrewAI e AutoGen para orquestrar vários agentes?
