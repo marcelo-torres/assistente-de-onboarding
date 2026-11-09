@@ -88,7 +88,7 @@ Motivo da etapa intermediária: a base é pequena, então revisar uma vez é mai
 
 `scripts/indexar_base.py` lê o markdown, corta por seção e grava no Chroma. Pode ser rodado de novo sem duplicar nada.
 
-- **Chunking:** hierárquico por heading, de 1.200 a 3.200 caracteres (cerca de 300 a 800 tokens, a ~4 caracteres por token, sem tokenizador). É a estratégia nº 3 do próprio `rag__estrategias-de-chunking.md`. Seções maiores são subdivididas por parágrafo, **sem overlap**.
+- **Chunking:** hierárquico por heading, de 1.200 a 3.200 caracteres (cerca de 300 a 800 tokens, a ~4 caracteres por token, sem tokenizador). É a estratégia nº 3 do próprio `rag__estrategias-de-chunking.md`. Seções maiores são subdivididas por parágrafo, **sem overlap** (justificativa e critério de revisão em [`estrategia-de-chunking.md`](estrategia-de-chunking.md)).
 - **Cabeçalho contextual:** o texto de cada trecho começa com `"{titulo} > {secao}"`, e esse é o texto embedado e guardado no Chroma.
 - **Embedding:** `gemini-embedding-001` via `google-genai`, dimensão padrão (3072), com `task_type=RETRIEVAL_DOCUMENT` na indexação e `RETRIEVAL_QUERY` na busca. Usa a mesma credencial que o ADK já usa (`GOOGLE_API_KEY` ou Vertex), sem configuração nova.
 - **Chroma:** `PersistentClient` em `data/chroma/` (no `.gitignore`), coleção `base_conhecimento`, distância de cosseno.
