@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101a2b">
+  <title>Aprender fazendo — Onboarding com agentes</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #f4f6fb;
+      --muted: #a6b2c5;
+      --line: rgba(208, 221, 244, .13);
+      --panel: rgba(19, 32, 52, .82);
+      --cyan: #70e1dc;
+      --blue: #82a9ff;
+      --amber: #ffc978;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: #0c1422; }
+    body {
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .slide {
+      width: min(100%, 1440px);
+      aspect-ratio: 16 / 9;
+      min-height: min(760px, calc(100vh - 48px));
+      max-height: calc(100vh - 48px);
+      position: relative;
+      overflow: hidden;
+      padding: clamp(34px, 5.2vw, 76px) clamp(34px, 6vw, 88px);
+      border: 1px solid rgba(220, 232, 255, .12);
+      border-radius: 24px;
+      background:
+        radial-gradient(ellipse at 89% 13%, rgba(60, 112, 177, .22), transparent 34%),
+        radial-gradient(ellipse at 9% 92%, rgba(39, 139, 139, .12), transparent 32%),
+        linear-gradient(135deg, #111d30 0%, #101a2b 55%, #0d1727 100%);
+      box-shadow: 0 32px 100px rgba(0, 0, 0, .45);
+      display: flex;
+      flex-direction: column;
+    }
+    .slide::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .16;
+      background-image: radial-gradient(rgba(190, 213, 255, .32) .7px, transparent .7px);
+      background-size: 23px 23px; mask-image: linear-gradient(115deg, transparent 30%, #000 100%);
+    }
+    .topline, .content, .footer { position: relative; z-index: 1; }
+    .topline { display: flex; align-items: center; gap: 12px; color: #c0cede; font-size: 12px; letter-spacing: .13em; text-transform: uppercase; font-weight: 650; }
+    .mark { width: 25px; height: 25px; display: grid; place-items: center; border: 1px solid rgba(112,225,220,.52); border-radius: 8px; color: var(--cyan); font-size: 12px; letter-spacing: 0; }
+    .content { display: grid; grid-template-columns: 1.03fr .97fr; gap: clamp(36px, 6vw, 90px); align-items: center; flex: 1; padding: 30px 0 20px; }
+    .eyebrow { color: var(--cyan); letter-spacing: .14em; text-transform: uppercase; font-size: 11px; font-weight: 700; margin: 0 0 18px; }
+    .intro { color: #d5deeb; font-size: clamp(16px, 1.5vw, 21px); line-height: 1.5; max-width: 600px; margin: 0 0 20px; }
+    .needs { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; max-width: 550px; }
+    .needs li { display: flex; align-items: center; gap: 12px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 11px; background: rgba(255,255,255,.025); color: #f0f4fa; font-size: clamp(14px, 1.2vw, 17px); font-weight: 570; }
+    .needs li::before { content: "↗"; color: var(--cyan); font-size: 14px; }
+    .lede { color: #b9c5d5; font-size: clamp(14px, 1.15vw, 16px); line-height: 1.6; max-width: 600px; margin: 19px 0 0; }
+    .lede strong { color: var(--ink); font-weight: 650; }
+    .reveal { margin-top: 23px; min-height: 78px; }
+    .reveal button { display: inline-flex; align-items: center; gap: 10px; border: 1px solid rgba(112,225,220,.38); border-radius: 999px; padding: 11px 16px; color: var(--cyan); background: rgba(112,225,220,.07); font: inherit; font-size: 12px; font-weight: 650; cursor: pointer; }
+    .reveal button:hover, .reveal button:focus-visible { background: rgba(112,225,220,.14); outline: 2px solid rgba(112,225,220,.45); outline-offset: 3px; }
+    .reveal button span { font-size: 16px; }
+    @keyframes arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    .diagram { position: relative; padding: 28px; border: 1px solid var(--line); border-radius: 22px; background: linear-gradient(150deg, rgba(24,40,63,.82), rgba(14,25,42,.7)); box-shadow: inset 0 1px rgba(255,255,255,.035); }
+    .diagram-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 21px; }
+    .diagram-head h2 { margin: 0; font-size: 13px; letter-spacing: .02em; font-weight: 620; color: #dbe5f3; }
+    .diagram-head, .proposal { display: none; }
+    .diagram.is-revealed .diagram-head { display: flex; animation: arrive .35s ease-out both; }
+    .diagram.is-revealed .proposal { display: block; animation: arrive .35s ease-out both; }
+    .proposal { margin: 0 0 20px; padding: 13px 15px; border-left: 2px solid var(--amber); border-radius: 0 12px 12px 0; background: rgba(255,201,120,.075); color: #fff0d7; font-size: clamp(14px, 1.15vw, 17px); line-height: 1.45; font-weight: 580; }
+    .live { color: #8fded5; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; display: flex; align-items: center; gap: 7px; }
+    .live::before { content: ""; width: 6px; height: 6px; background: var(--cyan); border-radius: 50%; box-shadow: 0 0 10px rgba(112,225,220,.8); }
+    .node { display: flex; gap: 14px; align-items: center; padding: 15px 16px; border: 1px solid var(--line); background: rgba(255,255,255,.025); border-radius: 13px; }
+    .node-icon { width: 36px; height: 36px; flex: 0 0 36px; display: grid; place-items: center; border-radius: 11px; font-size: 16px; }
+    .node h3 { margin: 0 0 4px; font-size: 14px; font-weight: 650; }
+    .node p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .mission .node-icon { color: var(--amber); background: rgba(255,201,120,.1); }
+    .tutor { border-color: rgba(112,225,220,.32); background: rgba(112,225,220,.055); }
+    .tutor .node-icon { color: var(--cyan); background: rgba(112,225,220,.12); }
+    .knowledge .node-icon { color: var(--blue); background: rgba(130,169,255,.12); }
+    .connector { height: 29px; position: relative; margin-left: 32px; border-left: 1px solid rgba(170,194,225,.3); }
+    .connector::after { content: ""; position: absolute; bottom: -1px; left: -4px; width: 7px; height: 7px; border-right: 1px solid #9bb3d3; border-bottom: 1px solid #9bb3d3; transform: rotate(45deg); }
+    .connector span { position: absolute; top: 7px; left: 13px; color: #8d9db3; font-size: 10px; white-space: nowrap; }
+    .footer { display: flex; justify-content: space-between; align-items: center; color: #8493a8; font-size: 10px; letter-spacing: .08em; text-transform: uppercase; border-top: 1px solid var(--line); padding-top: 17px; }
+    .page { display: flex; align-items: center; gap: 10px; }
+    .page::before { content: ""; width: 22px; height: 2px; background: var(--cyan); border-radius: 2px; }
+    .deck-nav { position: fixed; right: clamp(20px,5vw,72px); bottom: clamp(18px,4vh,42px); z-index: 5; display: flex; gap: 10px; }
+    .deck-nav a { display: inline-flex; align-items: center; gap: 9px; padding: 11px 15px; border: 1px solid rgba(208,221,244,.2); border-radius: 999px; background: rgba(16,29,47,.92); color: #dbe5f3; text-decoration: none; font-size: 12px; font-weight: 620; box-shadow: 0 8px 28px rgba(0,0,0,.2); }
+    .deck-nav a:last-child { border-color: rgba(112,225,220,.4); color: var(--cyan); }
+    .deck-nav a:hover,.deck-nav a:focus-visible { background: #20374e; outline: 2px solid rgba(112,225,220,.45); outline-offset: 3px; }
+    @media (max-width: 760px) {
+      body { padding: 0; display: block; }
+      .slide { width: 100%; min-height: 100vh; max-height: none; aspect-ratio: auto; border: 0; border-radius: 0; padding: 30px 24px; }
+      .content { grid-template-columns: 1fr; gap: 30px; padding: 42px 0 30px; }
+      .diagram { padding: 20px; }
+    }
+    @media (max-height: 650px) and (min-width: 761px) {
+      .slide { min-height: 0; padding-top: 34px; padding-bottom: 28px; }
+      .content { gap: 42px; padding: 16px 0; }
+      .lede { margin-top: 14px; font-size: 13px; }
+      .reveal { margin-top: 14px; }
+      .diagram { padding: 20px; }
+      .node { padding: 11px 13px; }
+      .connector { height: 21px; }
+    }
+    @media print {
+      @page { size: 13.333in 7.5in; margin: 0; }
+      html, body { width: 13.333in; height: 7.5in; padding: 0; background: #101a2b; }
+      .slide { width: 13.333in; height: 7.5in; min-height: 0; max-height: none; aspect-ratio: auto; border: 0; border-radius: 0; box-shadow: none; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    }
+  </style>
+</head>
+<body>
+  <main class="slide" aria-label="O desafio do onboarding">
+    <header class="topline">
+      <span class="mark" aria-hidden="true">↗</span>
+      <span>Onboarding que ensina fazendo</span>
+    </header>
+
+    <section class="content">
+      <div>
+        <p class="eyebrow">O desafio de começar</p>
+        <p class="intro">Ao chegar, a pessoa precisa aprender muita coisa ao mesmo tempo:</p>
+        <ul class="needs">
+          <li>Processos de trabalho</li>
+          <li>Sistemas e ferramentas</li>
+          <li>Regras de negócio</li>
+        </ul>
+        <p class="lede">A documentação oferece conhecimento, mas é na prática que se aprende. E, quando surge uma dúvida, ainda é preciso ter <strong>alguém por perto.</strong></p>
+        <div class="reveal" id="reveal-proposal">
+          <button type="button" aria-controls="proposal"><span aria-hidden="true">＋</span> Revelar a proposta</button>
+        </div>
+      </div>
+
+      <aside class="diagram" id="diagram" aria-label="Como funciona o onboarding guiado por agentes">
+        <div class="diagram-head">
+          <h2>Como funciona o onboarding guiado por agentes</h2>
+          <span class="live">Aprendizado guiado</span>
+        </div>
+        <p class="proposal" id="proposal" aria-live="polite">E se cada nova contratação tivesse um tutor para guiar a prática e responder às perguntas no caminho?</p>
+        <div class="node mission">
+          <span class="node-icon" aria-hidden="true">▤</span>
+          <div><h3>Missão</h3><p>Etapas, checkpoints e critérios de conclusão</p></div>
+        </div>
+        <div class="connector"><span>orienta passo a passo</span></div>
+        <div class="node tutor">
+          <span class="node-icon" aria-hidden="true">✳</span>
+          <div><h3>Agente tutor</h3><p>Guia a execução e valida cada etapa com a pessoa</p></div>
+        </div>
+        <div class="connector"><span>quando surge uma dúvida</span></div>
+        <div class="node knowledge">
+          <span class="node-icon" aria-hidden="true">⌕</span>
+          <div><h3>Agente de conhecimento</h3><p>Consulta a base específica da organização</p></div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <span>Do conhecimento à prática</span>
+      <span class="page">02 / 06</span>
+    </footer>
+  </main>
+  <nav class="deck-nav" aria-label="Navegação da apresentação">
+    <a href="index.html"><span aria-hidden="true">←</span> Anterior</a>
+    <a href="arquitetura-atual.html">Próximo <span aria-hidden="true">→</span></a>
+  </nav>
+  <script>
+    const reveal = document.querySelector('#reveal-proposal');
+    const revealButton = reveal.querySelector('button');
+    const diagram = document.querySelector('#diagram');
+    function showProposal() {
+      if (!diagram.classList.contains('is-revealed')) {
+        diagram.classList.add('is-revealed');
+        revealButton.setAttribute('aria-expanded', 'true');
+      }
+    }
+    revealButton.addEventListener('click', showProposal);
+    document.addEventListener('keydown', (event) => {
+      if ([' ', 'ArrowRight', 'Enter'].includes(event.key) && !diagram.classList.contains('is-revealed')) {
+        if (event.target === revealButton && event.key === 'Enter') return;
+        event.preventDefault();
+        showProposal();
+      }
+    });
+  </script>
+</body>
+</html>
