@@ -20,6 +20,10 @@ python scripts/converter_base.py
 
 # Indexar a base de conhecimento (antes do adk web; rodar de novo sempre que resources/base-conhecimento-md/ mudar)
 python scripts/indexar_base.py
+# Opcional (consome tokens do Gemini): enriquecer os trechos com perguntas geradas.
+# Veja o custo antes com --estimar, que não chama nenhuma API.
+python scripts/indexar_base.py --enriquecer --estimar
+python scripts/indexar_base.py --enriquecer
 
 # Avaliar a recuperação com as perguntas de tests/avaliacao/perguntas.yaml
 python scripts/avaliar_rag.py            # busca direta com a pergunta do usuário

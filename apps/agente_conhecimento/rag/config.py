@@ -25,3 +25,13 @@ TOP_K = 5
 # medida com só 3 perguntas negativas. Baixar para 0,69 cria falsos positivos;
 # subir para 0,71 perde acertos. Rode a avaliação de novo sempre que a base mudar.
 LIMIAR_SIMILARIDADE = 0.70
+
+# Enriquecimento dos trechos com perguntas geradas por LLM (ver rag/enriquecimento.py).
+# Desligado por padrão para não consumir tokens; ligue aqui ou com
+# `python scripts/indexar_base.py --enriquecer`. Antes, veja o custo com --estimar.
+ENRIQUECER_COM_PERGUNTAS = False
+MODELO_PERGUNTAS = "gemini-2.5-flash-lite"
+PERGUNTAS_POR_TRECHO = 3
+TRECHOS_POR_CHAMADA = 10
+# Versionável: quem clonar o repositório reaproveita as perguntas sem gerar de novo.
+ARQUIVO_PERGUNTAS_GERADAS = RAIZ_DO_PROJETO / "resources" / "perguntas-geradas.json"

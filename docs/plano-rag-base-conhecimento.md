@@ -169,3 +169,5 @@ Um único teste `pytest` (`tests/test_chunking.py`) cobre o chunking: corte por 
 **README:** acrescentar os passos `python scripts/indexar_base.py` antes do `adk web`.
 
 **Evoluções depois do MVP**, só se a Fase 4 mostrar recall baixo: busca híbrida (BM25 + RRF), reranking e chunks pai-filho.
+
+**Implementado como opção, ainda não medido:** enriquecimento dos trechos com perguntas geradas por LLM (`--enriquecer`), para aproximar o vocabulário de quem pergunta do vocabulário do material. Motivo, uso e cuidados com tokens em [`estrategia-de-chunking.md`](estrategia-de-chunking.md).

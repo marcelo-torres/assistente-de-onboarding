@@ -79,7 +79,56 @@ A reescrita só ajuda quando o LLM adivinha o conceito técnico, e HyDE ou multi
 Caminhos que ainda podem fechar essa distância, sem testes até aqui:
 
 - **Busca híbrida (BM25 + RRF):** não ajuda nestes dois casos, porque as palavras da pergunta não aparecem no texto.
-- **Enriquecer os trechos na indexação:** gerar por LLM perguntas que cada trecho responde e embedar junto. Ataca o problema do lado do documento, no vocabulário do usuário, sem depender do palpite na hora da consulta.
+- **Enriquecer os trechos na indexação:** gerar por LLM perguntas que cada trecho responde e embedar junto. Ataca o problema do lado do documento, no vocabulário do usuário, sem depender do palpite na hora da consulta. Implementado como opção; ver a próxima seção.
+
+## Enriquecimento dos trechos com perguntas geradas (opcional)
+
+**Status:** implementado e desligado por padrão. Ainda não foi executado nem medido.
+
+### Por quê
+
+As duas perguntas que não chegam ao agente falham por vocabulário, não por chunking. Quem pergunta descreve o problema ("documento muito longo", "pede de novo um comprovante"); o trecho nomeia a solução ("RAPTOR", "RAG stateless"). Reescrever a consulta não resolveu, porque depende de o LLM adivinhar o conceito técnico na hora da pergunta, e nos dois casos ele errou a direção.
+
+O enriquecimento ataca o mesmo problema do outro lado. Na indexação, com o trecho na frente, o LLM não precisa adivinhar nada: ele escreve perguntas que aquele trecho responde, no vocabulário de quem ainda não conhece os termos. Essas perguntas entram no embedding, e a pergunta real do usuário passa a ter algo parecido com ela para encontrar.
+
+### Como funciona
+
+- Para cada trecho, um LLM gera 3 perguntas no vocabulário de um desenvolvedor recém-chegado (`rag/enriquecimento.py`).
+- O embedding é feito sobre o trecho seguido de "Perguntas que este trecho responde:" e da lista.
+- O texto guardado no Chroma e entregue ao agente **não muda**: continua sendo só o trecho. As perguntas ficam no metadado `perguntas`, para inspeção.
+
+### Como usar
+
+```bash
+python scripts/indexar_base.py --estimar               # custo, sem chamar API
+python scripts/indexar_base.py --enriquecer --estimar  # custo com o enriquecimento
+python scripts/indexar_base.py --enriquecer            # indexa com perguntas geradas
+python scripts/avaliar_rag.py                           # mede o efeito
+```
+
+Também dá para ligar de vez com `ENRIQUECER_COM_PERGUNTAS = True` em `rag/config.py`.
+
+### Cuidados com o consumo de tokens
+
+| Medida | Efeito |
+| --- | --- |
+| Desligado por padrão | Nada é gerado sem pedir explicitamente |
+| `--estimar` | Mostra trechos a gerar, chamadas e tokens previstos, sem credencial e sem API |
+| Cache por hash do texto do trecho (`resources/perguntas-geradas.json`) | Reindexar não gera de novo; só trechos novos ou alterados chamam o LLM |
+| Cache versionável no git | Quem clonar o repositório reaproveita as perguntas sem pagar de novo |
+| Cache salvo a cada lote | Uma falha ou um 429 no meio não desperdiça o que já foi gerado |
+| 10 trechos por chamada | Cerca de 65 chamadas para a base inteira, em vez de 644 (também reduz 429) |
+| `gemini-2.5-flash-lite`, sem *thinking* | Modelo mais barato e sem tokens de raciocínio interno cobrados |
+| Saída JSON validada antes de entrar no cache | Resposta malformada falha sem gravar lixo |
+
+Um custo que continua existindo com ou sem enriquecimento: **toda indexação gera de novo o embedding de todos os trechos**, mesmo dos que não mudaram. O `--estimar` mostra esse número também.
+
+### Antes de adotar
+
+1. Rodar `--enriquecer --estimar` e conferir o custo.
+2. Indexar com `--enriquecer` e rodar `scripts/avaliar_rag.py` (busca direta e `--agente`).
+3. Conferir se as duas perguntas que falhavam passam a chegar ao agente **e se nenhuma pergunta fora da base passa do limiar**: perguntas genéricas geradas podem aproximar trechos de qualquer assunto, então o limiar de 0,70 pode precisar de nova calibração.
+4. Revisar algumas perguntas geradas no cache (é um JSON legível) e decidir se ele vai para o git.
 
 ## O que é overlap
 
