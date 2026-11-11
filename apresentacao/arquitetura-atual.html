@@ -1,5 +1,36 @@
 <!doctype html>
 <html lang="pt-BR">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101a2b"><title>Arquitetura atual</title><style>html,body{width:100%;height:100%;margin:0;background:#101a2b}nav{position:fixed;right:clamp(20px,5vw,72px);bottom:clamp(18px,4vh,42px);display:flex;gap:10px;font-family:system-ui,sans-serif}a{display:inline-flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid rgba(208,221,244,.2);border-radius:999px;background:rgba(16,29,47,.92);color:#dbe5f3;text-decoration:none;font-size:12px;font-weight:620}a:last-child{border-color:rgba(112,225,220,.4);color:#70e1dc}a:hover,a:focus-visible{background:#20374e;outline:2px solid rgba(112,225,220,.45);outline-offset:3px}</style></head>
-<body><nav aria-label="Navegação da apresentação"><a href="onboarding.html">← Anterior</a><a href="demonstracao.html">Próximo →</a></nav></body>
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="theme-color" content="#101a2b">
+  <title>Arquitetura atual</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;display:grid;place-items:center;padding:28px;color:#f4f6fb;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;background:radial-gradient(ellipse at 88% 12%,rgba(60,112,177,.2),transparent 34%),linear-gradient(135deg,#111d30,#0d1727)}
+    main{width:min(100%,1160px);padding:clamp(26px,4vw,52px);border:1px solid rgba(208,221,244,.14);border-radius:22px;background:rgba(19,32,52,.72)}.eyebrow{margin:0 0 12px;color:#70e1dc;font-size:11px;font-weight:700;letter-spacing:.15em;text-transform:uppercase}h1{margin:0;font-size:clamp(36px,5vw,58px);line-height:1;letter-spacing:-.05em}.description{margin:13px 0 28px;color:#c2ccda;font-size:15px;line-height:1.5}
+    .architecture{display:grid;grid-template-columns:minmax(0,1fr) 52px minmax(0,1fr) 52px minmax(0,1fr);grid-template-rows:auto 42px auto;align-items:center;gap:0 8px}
+    .node{min-height:104px;padding:18px;border:1px solid rgba(208,221,244,.16);border-radius:15px;background:linear-gradient(145deg,rgba(29,47,72,.9),rgba(18,31,50,.88));display:flex;flex-direction:column;justify-content:center;gap:7px}
+    .node.tutor{border-color:rgba(112,225,220,.38);background:linear-gradient(145deg,rgba(30,71,78,.65),rgba(18,38,55,.9))}.node.knowledge{border-color:rgba(130,169,255,.34)}.node.vector{border-color:rgba(130,169,255,.48);background:linear-gradient(145deg,rgba(45,62,99,.72),rgba(22,35,59,.92))}.node.tools{border-color:rgba(255,201,120,.34)}.node.documents{border-color:rgba(255,201,120,.34)}
+    .kind{color:#9dacbf;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}.node strong{font-size:clamp(14px,1.4vw,18px);font-weight:650}.node small{color:#a6b2c5;font-size:12px;line-height:1.4}
+    .arrow{display:flex;align-items:center;justify-content:center;gap:4px;color:#9cacbf;font-size:10px;text-align:center}.arrow.horizontal{position:relative;grid-row:1;height:100%;flex-direction:column}.arrow.horizontal::before{content:"";position:absolute;left:0;right:7px;top:50%;border-top:1px solid rgba(157,179,211,.65)}.arrow.horizontal::after{content:"";position:absolute;right:2px;top:calc(50% - 4px);width:7px;height:7px;border-top:1px solid #a8bad1;border-right:1px solid #a8bad1;transform:rotate(45deg)}.arrow.horizontal span{position:absolute;top:calc(50% + 10px);width:80px;z-index:1;padding:2px 4px;background:#17263b}
+    .down-flow{grid-column:1;grid-row:2/4;align-self:stretch;display:grid;grid-template-rows:42px auto}.down-arrow,.up-arrow{position:relative;display:flex;justify-content:center;align-items:center;color:#9cacbf;font-size:10px}.down-arrow::before,.up-arrow::before{content:"";height:25px;border-left:1px solid rgba(157,179,211,.65)}.down-arrow::after{content:"";position:absolute;bottom:5px;width:7px;height:7px;border-right:1px solid #a8bad1;border-bottom:1px solid #a8bad1;transform:rotate(45deg)}.up-flow{grid-column:5;grid-row:2/4;align-self:stretch;display:grid;grid-template-rows:42px auto}.up-arrow::before{height:25px}.up-arrow::after{content:"";position:absolute;top:5px;width:7px;height:7px;border-left:1px solid #a8bad1;border-top:1px solid #a8bad1;transform:rotate(45deg)}.up-arrow span{position:absolute;right:calc(50% + 12px);top:50%;transform:translateY(-50%);padding:3px 6px;border-radius:5px;background:#17263b;color:#70e1dc;font-size:10px;font-weight:700;letter-spacing:.08em}
+    nav{position:fixed;right:clamp(20px,5vw,72px);bottom:clamp(18px,4vh,42px);display:flex;gap:10px}nav a{display:inline-flex;align-items:center;gap:9px;padding:11px 15px;border:1px solid rgba(208,221,244,.2);border-radius:999px;background:rgba(16,29,47,.94);color:#dbe5f3;text-decoration:none;font-size:12px;font-weight:620}nav a:last-child{border-color:rgba(112,225,220,.4);color:#70e1dc}nav a:hover,nav a:focus-visible{background:#20374e;outline:2px solid rgba(112,225,220,.45);outline-offset:3px}
+    @media(max-width:760px){body{padding:20px 16px 86px}main{padding:26px 20px}.architecture{display:flex;flex-direction:column;gap:7px}.node{width:100%;min-height:82px}.arrow.horizontal{height:30px;width:100%}.arrow.horizontal::before{left:50%;right:auto;top:0;bottom:6px;border-top:0;border-left:1px solid rgba(157,179,211,.65)}.arrow.horizontal::after{right:auto;top:auto;bottom:2px;transform:rotate(135deg)}.arrow.horizontal span{top:7px;left:calc(50% + 10px);width:auto;white-space:nowrap}.down-flow,.up-flow{display:contents}.down-arrow,.up-arrow{height:28px}.down-arrow::before,.up-arrow::before{height:20px}.up-arrow span{right:calc(50% + 12px)}nav{right:16px;bottom:16px}}
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">03 / 06 · Estado atual</p>
+    <h1>Arquitetura atual</h1>
+    <p class="description">O tutor conduz a missão, consulta conhecimento quando necessário e também aciona ferramentas.</p>
+    <section class="architecture" aria-label="Diagrama da arquitetura atual">
+      <article class="node tutor"><span class="kind">Orquestração</span><strong>Agente Tutor</strong><small>Conduz a missão e acompanha as etapas</small></article>
+      <div class="arrow horizontal" style="grid-column:2" aria-hidden="true"><span>consulta</span></div>
+      <article class="node knowledge" style="grid-column:3"><span class="kind">Dúvidas e apoio</span><strong>Agente de Conhecimento</strong><small>Busca respostas na base da organização</small></article>
+      <div class="arrow horizontal" style="grid-column:4" aria-hidden="true"><span>recupera</span></div>
+      <article class="node vector" style="grid-column:5"><span class="kind">Recuperação</span><strong>Base Vetorial</strong><small>Conteúdo indexado para busca semântica</small></article>
+      <div class="down-flow"><div class="down-arrow" aria-hidden="true"></div><article class="node tools"><span class="kind">Ações</span><strong>Tools</strong><small>Funções disponíveis ao agente tutor</small></article></div>
+      <div class="up-flow"><div class="up-arrow" aria-hidden="true"><span>RAG</span></div><article class="node documents"><span class="kind">Fontes</span><strong>Documentos</strong><small>PDF, HTML, Markdown e outros formatos</small></article></div>
+    </section>
+  </main>
+  <nav aria-label="Navegação da apresentação"><a href="onboarding.html">← Anterior</a><a href="demonstracao.html">Próximo →</a></nav>
+</body>
 </html>
