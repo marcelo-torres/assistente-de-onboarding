@@ -223,3 +223,6 @@ __marimo__/
 
 # Índice do RAG (gerado por scripts/indexar_base.py)
 data/chroma/
+
+# macOS
+.DS_Store

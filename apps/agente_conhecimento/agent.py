@@ -5,9 +5,16 @@ from .rag.busca import buscar_base_conhecimento
 
 agente_conhecimento = Agent(
     name='agente_conhecimento',
-    description='Agente de conhecimento para auxiliar desenvolvedores a entenderem o funcionamento do sistema.',
+    description=(
+        'Responde dúvidas conceituais com base na base de conhecimento da organização, citando as fontes: '
+        'agentes de IA e Google ADK, RAG, embeddings, chunking, vector stores (Chroma, Vertex AI Vector Search), '
+        'busca híbrida, guardrails, memória de agentes e economia de tokens.'
+    ),
     model='gemini-2.5-flash',
     tools=[buscar_base_conhecimento],
+    # Responde e encerra a vez: a próxima mensagem do usuário volta ao agente pai (o tutor),
+    # que retoma a missão. Sem isso, o ADK manda a próxima mensagem a este agente.
+    disallow_transfer_to_parent=True,
     instruction="""
         Você responde perguntas usando somente a base de conhecimento.
 
