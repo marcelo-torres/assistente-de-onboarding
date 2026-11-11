@@ -6,8 +6,8 @@
 
 **Status:** ready-for-agent
 
-- [ ] Os 5 `.md` existem na pasta de markdown revisado, nenhum vazio, só com menus ou com HTML residual
+- [x] Os 5 `.md` existem na pasta de markdown revisado, nenhum vazio, só com menus ou com HTML residual
 - [ ] O autor revisou cada `.md` lado a lado com o original
-- [ ] `beautifulsoup4` está no `requirements.txt`
-- [ ] Após reindexar, a coleção tem trechos dos 5 arquivos
-- [ ] No `adk web`, uma pergunta sobre BM25/RRF cita `busca-hibrida__bm25-e-rrf`
+- [x] `beautifulsoup4` está no `requirements.txt`
+- [x] Após reindexar, a coleção tem trechos dos 5 arquivos
+- [x] No `adk web`, uma pergunta sobre BM25/RRF cita `busca-hibrida__bm25-e-rrf`

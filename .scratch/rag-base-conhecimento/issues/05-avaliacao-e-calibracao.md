@@ -4,9 +4,9 @@
 
 **Blocked by:** 02 — HTMLs estáticos; 03 — PDFs; 04 — HTMLs com conteúdo em JS
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] O arquivo de perguntas tem 13 perguntas da base (uma por arquivo) e 3 fora da base próximas do domínio
-- [ ] O script de avaliação imprime hit@3 e lista os falsos positivos
-- [ ] Tamanho dos trechos e limiar ajustados e registrados na configuração do RAG
-- [ ] hit@3 ≥ 85% nas perguntas da base e nenhum falso positivo fora dela (meta inicial, pode ser revista após a primeira rodada)
+- [x] O arquivo de perguntas tem 13 perguntas da base (uma por arquivo) e 3 fora da base próximas do domínio
+- [x] O script de avaliação imprime hit@3 e lista os falsos positivos
+- [x] Tamanho dos trechos e limiar ajustados e registrados na configuração do RAG
+- [x] hit@3 ≥ 85% nas perguntas da base e nenhum falso positivo fora dela (meta inicial, pode ser revista após a primeira rodada)

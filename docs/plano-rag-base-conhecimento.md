@@ -88,7 +88,7 @@ Motivo da etapa intermediária: a base é pequena, então revisar uma vez é mai
 
 `scripts/indexar_base.py` lê o markdown, corta por seção e grava no Chroma. Pode ser rodado de novo sem duplicar nada.
 
-- **Chunking:** hierárquico por heading, de 1.200 a 3.200 caracteres (cerca de 300 a 800 tokens, a ~4 caracteres por token, sem tokenizador). É a estratégia nº 3 do próprio `rag__estrategias-de-chunking.md`. Seções maiores são subdivididas por parágrafo, **sem overlap** (justificativa e critério de revisão em [`estrategia-de-chunking.md`](estrategia-de-chunking.md)).
+- **Chunking:** hierárquico por heading, até 2.000 caracteres por trecho (cerca de 500 tokens, a ~4 caracteres por token, sem tokenizador); uma seção que cabe inteira com as subseções vira um trecho só. Valores calibrados na Fase 4. É a estratégia nº 3 do próprio `rag__estrategias-de-chunking.md`. Seções maiores são subdivididas por parágrafo, **sem overlap** (justificativa e critério de revisão em [`estrategia-de-chunking.md`](estrategia-de-chunking.md)).
 - **Cabeçalho contextual:** o texto de cada trecho começa com `"{titulo} > {secao}"`, e esse é o texto embedado e guardado no Chroma.
 - **Embedding:** `gemini-embedding-001` via `google-genai`, dimensão padrão (3072), com `task_type=RETRIEVAL_DOCUMENT` na indexação e `RETRIEVAL_QUERY` na busca. Usa a mesma credencial que o ADK já usa (`GOOGLE_API_KEY` ou Vertex), sem configuração nova.
 - **Chroma:** `PersistentClient` em `data/chroma/` (no `.gitignore`), coleção `base_conhecimento`, distância de cosseno.
@@ -146,6 +146,8 @@ Um único teste `pytest` (`tests/test_chunking.py`) cobre o chunking: corte por 
 
 **Pronto quando:** hit@3 ≥ 85% nas perguntas da base e nenhum falso positivo nas perguntas fora dela. A meta é uma proposta inicial e pode ser revista após a primeira rodada.
 
+**Resultado (2026-11-09):** hit@3 pela tool 85% (11/13), 0/3 falsos positivos, com trechos de até 2.000 caracteres e limiar 0,70. A meta foi atingida no limite, com margem de 0,009 no limiar; detalhes em [`estrategia-de-chunking.md`](estrategia-de-chunking.md).
+
 ## Decisões, dependências e evoluções
 
 | Decisão | Escolha | Alternativa descartada |
@@ -155,7 +157,7 @@ Um único teste `pytest` (`tests/test_chunking.py`) cobre o chunking: corte por 
 | Pré-processamento | Markdown intermediário, versionado e revisado; conversor e originais mantidos como material didático | Extrair direto na indexação, sem revisão |
 | Extração dos HTMLs com JS | Playwright com `page.evaluate` | Regex + JSON (frágil se o literal JS não for JSON válido) |
 | Proteção contra reconversão | Nenhuma; o git recupera | Flag `--forcar` |
-| Chunking | Hierárquico por heading, medido em caracteres, sem overlap, com cabeçalho contextual | Tamanho fixo; contagem por tokenizador; overlap de 10% |
+| Chunking | Hierárquico por heading, medido em caracteres, sem overlap, com cabeçalho contextual; seção e subseções viram um trecho só quando cabem em 2.000 caracteres (decidido na Fase 4: subseções minúsculas geravam embeddings fracos) | Tamanho fixo; contagem por tokenizador; overlap de 10%; sem junção de subseções (cita a subseção exata, mas recupera pior) |
 | IDs | `"{fonte}::{indice_chunk}"` com delete por fonte + add | `hash()` do Python (muda a cada processo) |
 | Filtro por tema | Fora da tool no MVP | Parâmetro `tema` (LLM pode filtrar errado) |
 | Busca | Somente densa (vetorial) no MVP | Híbrida desde o início |
@@ -167,3 +169,5 @@ Um único teste `pytest` (`tests/test_chunking.py`) cobre o chunking: corte por 
 **README:** acrescentar os passos `python scripts/indexar_base.py` antes do `adk web`.
 
 **Evoluções depois do MVP**, só se a Fase 4 mostrar recall baixo: busca híbrida (BM25 + RRF), reranking e chunks pai-filho.
+
+**Implementado como opção, ainda não medido:** enriquecimento dos trechos com perguntas geradas por LLM (`--enriquecer`), para aproximar o vocabulário de quem pergunta do vocabulário do material. Motivo, uso e cuidados com tokens em [`estrategia-de-chunking.md`](estrategia-de-chunking.md).

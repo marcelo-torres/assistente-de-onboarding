@@ -16,13 +16,13 @@ Decisões do plano (`docs/plano-rag-base-conhecimento.md`) que valem aqui:
 
 **Blocked by:** None (can start immediately)
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] O markdown de `rag__estrategias-de-chunking` está na pasta de markdown revisado e é indexado pelo script de indexação
-- [ ] Rodar o script de indexação duas vezes imprime a mesma contagem de trechos
-- [ ] Remover um `.md` da pasta e reindexar apaga os trechos daquela fonte
-- [ ] Um teste `pytest` cobre o chunking: corte por heading, limite de tamanho e metadados
-- [ ] Sem índice criado, a tool devolve mensagem clara pedindo para rodar a indexação
-- [ ] No `adk web`, "o que é chunking pai-filho?" volta com resposta citando fonte e seção corretas
-- [ ] No `adk web`, uma pergunta fora da base volta com "não encontrei"
-- [ ] `requirements.txt` inclui `chromadb` e `pytest`; o diretório do índice está no `.gitignore`; o README documenta o passo de indexação antes do `adk web`
+- [x] O markdown de `rag__estrategias-de-chunking` está na pasta de markdown revisado e é indexado pelo script de indexação
+- [x] Rodar o script de indexação duas vezes imprime a mesma contagem de trechos
+- [x] Remover um `.md` da pasta e reindexar apaga os trechos daquela fonte
+- [x] Um teste `pytest` cobre o chunking: corte por heading, limite de tamanho e metadados
+- [x] Sem índice criado, a tool devolve mensagem clara pedindo para rodar a indexação
+- [x] No `adk web`, "o que é chunking pai-filho?" volta com resposta citando fonte e seção corretas
+- [x] No `adk web`, uma pergunta fora da base volta com "não encontrei"
+- [x] `requirements.txt` inclui `chromadb` e `pytest`; o diretório do índice está no `.gitignore`; o README documenta o passo de indexação antes do `adk web`
