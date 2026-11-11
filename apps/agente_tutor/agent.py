@@ -1,7 +1,32 @@
 # root_agent é o ponto de entrada que o ADK Web procura nesta aplicação.
+from __future__ import annotations
+
+import sys
+from pathlib import Path
 from google.adk import Agent
+from google.genai import types
+
+# Garante resolução de imports tanto no ADK Web quanto em testes
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from agente_conhecimento.agent import agente_conhecimento
+
+try:
+    from guardrails import (
+        get_safety_settings,
+        guardrail_after_model_callback,
+        guardrail_before_model_callback,
+        guardrail_before_tool_callback,
+        guardrail_on_model_error_callback,
+    )
+except ImportError:
+    from apps.guardrails import (
+        get_safety_settings,
+        guardrail_after_model_callback,
+        guardrail_before_model_callback,
+        guardrail_before_tool_callback,
+        guardrail_on_model_error_callback,
+    )
 
 def listar_missoes() -> list[str]:
     """Devolve a lista de missões disponíveis para o usuário
@@ -209,5 +234,12 @@ root_agent = Agent(
     """,
 
     tools=[obter_missao, listar_missoes],
-    sub_agents=[agente_conhecimento]
+    sub_agents=[agente_conhecimento],
+    generate_content_config=types.GenerateContentConfig(
+        safety_settings=get_safety_settings(),
+    ),
+    before_model_callback=guardrail_before_model_callback,
+    before_tool_callback=guardrail_before_tool_callback,
+    after_model_callback=guardrail_after_model_callback,
+    on_model_error_callback=guardrail_on_model_error_callback,
 )
