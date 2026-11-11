@@ -220,3 +220,6 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Índice do RAG (gerado por scripts/indexar_base.py)
+data/chroma/

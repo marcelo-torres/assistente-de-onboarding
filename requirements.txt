@@ -2,3 +2,10 @@
 # As dependências transitivas são resolvidas pelo pip para seu sistema operacional.
 google-adk[mcp]==2.10.0
 google-genai==2.26.0
+beautifulsoup4==4.15.0
+chromadb==1.5.9
+playwright==1.64.1
+pypdf==7.0.0
+python-dotenv==1.2.4
+pyyaml==6.0.3
+pytest==9.2.0
