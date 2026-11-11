@@ -91,6 +91,28 @@ _ESPERAS_APOS_429 = (30, 60, 120)
 
 
 def gerar_perguntas_gemini(textos: list[str]) -> list[list[str]]:
+    """Perguntas para um lote de trechos pelo Gemini, dividindo o lote se a resposta vier inválida."""
+    return dividir_se_invalida(_gerar_lote_gemini, textos)
+
+
+def dividir_se_invalida(gerar: GerarPerguntas, textos: list[str]) -> list[list[str]]:
+    """Chama `gerar` no lote; se a resposta for inválida, tenta cada metade do lote.
+
+    Lotes grandes às vezes voltam com uma lista a mais ou a menos (o modelo junta ou
+    separa trechos). Dividir resolve sem desperdiçar o lote inteiro: no pior caso,
+    cada trecho vira uma chamada. Com um trecho só, o erro sobe.
+    """
+    try:
+        return gerar(textos)
+    except ValueError as erro:
+        if len(textos) == 1:
+            raise
+        meio = len(textos) // 2
+        print(f"  (resposta inválida para {len(textos)} trechos, dividindo o lote: {str(erro)[:80]})")
+        return dividir_se_invalida(gerar, textos[:meio]) + dividir_se_invalida(gerar, textos[meio:])
+
+
+def _gerar_lote_gemini(textos: list[str]) -> list[list[str]]:
     """Uma chamada ao Gemini para um lote de trechos; tenta de novo após 429."""
     from google.genai import types
 
@@ -100,8 +122,11 @@ def gerar_perguntas_gemini(textos: list[str]) -> list[list[str]]:
     config = types.GenerateContentConfig(
         system_instruction=_INSTRUCAO.format(n=PERGUNTAS_POR_TRECHO),
         response_mime_type="application/json",
+        # A quantidade de listas é fixada no schema: uma por trecho do lote.
         response_schema=types.Schema(
             type=types.Type.ARRAY,
+            min_items=len(textos),
+            max_items=len(textos),
             items=types.Schema(type=types.Type.ARRAY, items=types.Schema(type=types.Type.STRING)),
         ),
         temperature=0.2,

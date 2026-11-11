@@ -81,9 +81,9 @@ Caminhos que ainda podem fechar essa distância, sem testes até aqui:
 - **Busca híbrida (BM25 + RRF):** não ajuda nestes dois casos, porque as palavras da pergunta não aparecem no texto.
 - **Enriquecer os trechos na indexação:** gerar por LLM perguntas que cada trecho responde e embedar junto. Ataca o problema do lado do documento, no vocabulário do usuário, sem depender do palpite na hora da consulta. Implementado como opção; ver a próxima seção.
 
-## Enriquecimento dos trechos com perguntas geradas (opcional)
+## Enriquecimento dos trechos com perguntas geradas
 
-**Status:** implementado e desligado por padrão. Ainda não foi executado nem medido.
+**Status:** medido em 2026-11-11 e ligado por padrão (`ENRIQUECER_COM_PERGUNTAS = True`). O cache com as perguntas dos 643 trechos distintos está versionado em `resources/perguntas-geradas.json`. Resultados em [Medição](#medição-2026-11-11).
 
 ### Por quê
 
@@ -123,12 +123,48 @@ Também dá para ligar de vez com `ENRIQUECER_COM_PERGUNTAS = True` em `rag/conf
 
 Um custo que continua existindo com ou sem enriquecimento: **toda indexação gera de novo o embedding de todos os trechos**, mesmo dos que não mudaram. O `--estimar` mostra esse número também.
 
-### Antes de adotar
+### Medição (2026-11-11)
 
-1. Rodar `--enriquecer --estimar` e conferir o custo.
-2. Indexar com `--enriquecer` e rodar `scripts/avaliar_rag.py` (busca direta e `--agente`).
-3. Conferir se as duas perguntas que falhavam passam a chegar ao agente **e se nenhuma pergunta fora da base passa do limiar**: perguntas genéricas geradas podem aproximar trechos de qualquer assunto, então o limiar de 0,70 pode precisar de nova calibração.
-4. Revisar algumas perguntas geradas no cache (é um JSON legível) e decidir se ele vai para o git.
+Roteiro seguido: estimar o custo, indexar com `--enriquecer`, rodar as duas avaliações, revisar uma amostra das perguntas geradas.
+
+**Custo.** A estimativa previa 70 chamadas ao `gemini-2.5-flash-lite` (~137 mil tokens de entrada e ~48 mil de saída) e ~175 mil tokens de embedding. A geração rodou sem nenhum 429.
+
+**Falha na primeira tentativa.** No primeiro lote, o modelo devolveu uma quantidade de listas de perguntas diferente da de trechos, e a validação barrou a resposta antes do cache, como previsto. O índice não foi afetado, porque a geração roda antes de apagar qualquer trecho. Correções:
+
+- O schema de saída fixa a quantidade de listas (`min_items` = `max_items` = trechos do lote). Só isso já resolveu na segunda tentativa.
+- Como garantia, `dividir_se_invalida` divide o lote ao meio e tenta cada metade se a resposta ainda vier inválida, até chegar a trechos individuais.
+
+**Busca direta** (`python scripts/avaliar_rag.py`):
+
+| Métrica | Sem enriquecimento | Com enriquecimento |
+| --- | --- | --- |
+| hit@3 pela tool (acima do limiar) | 11/13 = 85% | **12/13 = 92%** |
+| hit@3 bruto / estrito | 92% / 92% | 92% / 92% |
+| Falsos positivos | 0/3 | 0/3 |
+| Acerto mais fraco que chega ao agente × maior nota fora da base | 0,701 × 0,692 | 0,701 × 0,693 |
+
+**Agente real** (`python scripts/avaliar_rag.py --agente`, uma rodada de cada; o LLM não é determinístico):
+
+| Métrica | Sem enriquecimento | Com enriquecimento |
+| --- | --- | --- |
+| Trecho certo no top-3 de alguma busca | 11/13 | **12/13** |
+| Respondeu "não encontrei" para pergunta da base | 1/13 | **0/13** |
+| Fora da base: a busca trouxe trechos | 2/3 | **3/3** (piorou) |
+| Fora da base: respondeu "não encontrei" | 3/3 | 3/3 |
+
+**As duas perguntas que falhavam:**
+
+- **Comprovante pedido de novo:** passou a chegar ao agente (0,665 → 0,707 na busca direta; 0,78 pela consulta do agente). Uma das perguntas geradas para o trecho é quase a do usuário: "Por que o sistema de IA às vezes pede o comprovante de renda de novo, mesmo que eu já tenha enviado?".
+- **Documento longo (RAPTOR):** continua falhando. As perguntas geradas falam em "resumir vários documentos" e "visão geral", não em "documento muito longo". A técnica aproxima vocabulários, mas não garante que o LLM preveja a pergunta exata.
+
+**Efeito colateral: o limiar deixou de barrar as perguntas fora da base pelo agente.** Com as consultas expandidas pelo agente, as três perguntas fora da base (vLLM, RLHF, CrewAI/AutoGen) trouxeram trechos com notas de 0,70 a 0,73, no nível de acertos verdadeiros (o mais fraco pelo agente foi 0,71). Quem segurou foi a regra 5 do prompt: o agente disse "não encontrei" nas três. A proteção contra respostas fora da base passou de duas camadas (limiar e prompt) para uma (prompt).
+
+**Revisão das perguntas geradas.** Uma amostra aleatória está no vocabulário pedido (descreve o problema, não repete o título), e só 1 trecho ficou com menos de 3 perguntas.
+
+**Decisão.** Adotado: ganho em acerto pela tool e pelo agente, nenhuma recusa indevida e recusa correta fora da base. Pendências para recuperar a segunda camada:
+
+1. Ampliar as perguntas fora da base de 3 para cerca de 10, com assuntos de IA próximos da base. O limiar está calibrado com pouquíssimos negativos.
+2. Com esse conjunto, recalibrar o limiar. Subir para 0,72–0,73 pode barrar os negativos, mas o acerto mais fraco pela tool está em 0,701; a medição dirá se há espaço.
 
 ## O que é overlap
 

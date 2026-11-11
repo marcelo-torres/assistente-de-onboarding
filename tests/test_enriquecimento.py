@@ -64,3 +64,32 @@ def test_indexacao_enriquecida_embeda_as_perguntas_mas_guarda_o_trecho_original(
         "Guia > RAPTOR\n\nSumários em árvore.\n\n"
         "Perguntas que este trecho responde:\n- Como resumir um documento longo?"
     ]
+
+
+def test_lote_com_resposta_invalida_e_dividido_ate_dar_certo():
+    from agente_conhecimento.rag.enriquecimento import dividir_se_invalida
+
+    chamadas = []
+
+    def gerar(textos):
+        chamadas.append(list(textos))
+        if len(textos) > 2:
+            raise ValueError("lista a mais")
+        return [[f"pergunta de {t}"] for t in textos]
+
+    assert dividir_se_invalida(gerar, ["A", "B", "C", "D", "E"]) == [
+        ["pergunta de A"], ["pergunta de B"], ["pergunta de C"], ["pergunta de D"], ["pergunta de E"]
+    ]
+    assert chamadas == [["A", "B", "C", "D", "E"], ["A", "B"], ["C", "D", "E"], ["C"], ["D", "E"]]
+
+
+def test_trecho_sozinho_com_resposta_invalida_propaga_o_erro():
+    import pytest
+
+    from agente_conhecimento.rag.enriquecimento import dividir_se_invalida
+
+    def gerar(textos):
+        raise ValueError("sempre inválida")
+
+    with pytest.raises(ValueError):
+        dividir_se_invalida(gerar, ["A", "B"])

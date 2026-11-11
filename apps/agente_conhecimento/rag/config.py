@@ -27,9 +27,11 @@ TOP_K = 5
 LIMIAR_SIMILARIDADE = 0.70
 
 # Enriquecimento dos trechos com perguntas geradas por LLM (ver rag/enriquecimento.py).
-# Desligado por padrão para não consumir tokens; ligue aqui ou com
-# `python scripts/indexar_base.py --enriquecer`. Antes, veja o custo com --estimar.
-ENRIQUECER_COM_PERGUNTAS = False
+# Ligado após a medição de 2026-11-11 (docs/estrategia-de-chunking.md): hit@3 pela tool
+# de 85% para 92%, sem falsos positivos na busca direta. As perguntas já geradas estão
+# versionadas em ARQUIVO_PERGUNTAS_GERADAS, então reindexar só chama o LLM para trechos
+# novos ou alterados. Veja o custo antes com `python scripts/indexar_base.py --estimar`.
+ENRIQUECER_COM_PERGUNTAS = True
 MODELO_PERGUNTAS = "gemini-2.5-flash-lite"
 PERGUNTAS_POR_TRECHO = 3
 TRECHOS_POR_CHAMADA = 10
