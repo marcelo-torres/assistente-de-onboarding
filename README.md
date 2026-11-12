@@ -29,4 +29,4 @@ python scripts/indexar_base.py --enriquecer
 python scripts/avaliar_rag.py            # busca direta com a pergunta do usuário
 python scripts/avaliar_rag.py --agente   # agente real (usa o LLM; mais lento)
 
-.venv\Scripts\adk.exe web ./apps --host 127.0.0.1 --port 8897
+.venv\Scripts\adk web ./apps --port 8897 --allow_origins=null

@@ -238,6 +238,51 @@ html,body{margin:0;height:100%;background:#0a1220;font-family:var(--font);-webki
 .livebox{display:none;flex:1;flex-direction:column;min-height:0}
 .demo.live-on .feed{display:none}
 .demo.live-on .livebox{display:flex}
+.live-switch{display:none;gap:4px;margin-left:8px;padding:3px;border:1px solid var(--line);border-radius:999px;background:rgba(0,0,0,.25)}
+.demo.live-on .live-switch{display:flex}
+.live-switch button{border:0;background:transparent;color:var(--muted);font:600 10px var(--font);padding:4px 9px;border-radius:999px;cursor:pointer}
+.live-switch button.on{background:rgba(112,225,220,.16);color:var(--cyan)}
+.livebox .urlbar{display:none}
+.demo.adk-chat-on .urlbar{display:flex}
+.demo.adk-chat-on .frame{display:none}
+.adk-chat{display:none;flex:1;min-height:0;grid-template-columns:190px minmax(0,1fr);grid-template-rows:minmax(0,1fr);overflow:hidden}
+.demo.adk-chat-on .adk-chat{display:grid}
+.chat-list{padding:10px;border-right:1px solid var(--line);display:flex;flex-direction:column;gap:7px;overflow:auto}
+.chat-list button{border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--soft);border-radius:8px;padding:8px;text-align:left;font:12px var(--font);cursor:pointer}
+.chat-list button.active{border-color:rgba(112,225,220,.5);color:var(--cyan)}
+.chat-list .new-chat{background:rgba(112,225,220,.1);font-weight:700;text-align:center}
+.session-item{display:flex;align-items:stretch;gap:4px}
+.session-item .session-open{flex:1;min-width:0}
+.session-item .session-delete{flex:0 0 30px;padding:4px;color:var(--rose);text-align:center}
+.adk-conversation{min-width:0;min-height:0;height:100%;display:flex;flex-direction:column;padding:12px;gap:10px;overflow:hidden}
+.adk-messages{flex:1;min-height:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior:contain;scrollbar-gutter:stable;overflow-anchor:none;display:flex;flex-direction:column;gap:9px;padding:2px 6px 8px 2px}
+.adk-messages::-webkit-scrollbar{width:8px}
+.adk-messages::-webkit-scrollbar-thumb{background:rgba(157,179,211,.28);border-radius:8px}
+.adk-message{box-sizing:border-box;flex:0 0 auto;width:fit-content;min-width:0;max-width:min(85%,700px);white-space:pre-wrap;overflow-wrap:anywhere;word-break:break-word;padding:9px 12px;border-radius:12px;background:rgba(112,225,220,.1);font-size:13px;line-height:1.45}
+.adk-message>*{box-sizing:border-box;min-width:0;max-width:100%}
+.adk-message.user{align-self:flex-end;max-width:85%;background:#22324d}
+.adk-content{min-width:0;max-width:100%;overflow-wrap:anywhere;word-break:break-word;white-space:normal}
+.adk-content p{margin:0 0 8px}.adk-content p:last-child{margin-bottom:0}
+.adk-content ul,.adk-content ol{margin:5px 0 8px;padding-left:20px}
+.adk-content li{margin:3px 0}
+.adk-content pre{max-width:100%;overflow-x:auto;white-space:pre;padding:9px;border-radius:8px;background:rgba(0,0,0,.3)}
+.adk-content code{font-family:var(--mono);font-size:.92em;background:rgba(0,0,0,.25);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}
+.adk-content pre code{background:none;padding:0;overflow-wrap:normal}
+.adk-content a{color:#a9c6ff;overflow-wrap:anywhere}
+.adk-speaker{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#8fded5}
+.adk-message.user .adk-speaker{color:#aabbd4;text-align:right}
+.adk-message.knowledge{background:rgba(130,169,255,.1);border:1px solid rgba(130,169,255,.28)}
+.adk-message.knowledge .adk-speaker{color:#aac3ff}
+.adk-message.tool-event{background:rgba(255,201,120,.08);border:1px solid rgba(255,201,120,.25);color:var(--amber);font:11px var(--mono)}
+.adk-message.delegate-event{background:rgba(130,169,255,.08);border:1px solid rgba(130,169,255,.25);color:#c4d3ff;font-size:11px}
+.adk-message.typing{display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-start;gap:5px;width:max-content;min-width:88px;max-width:85%;min-height:52px;justify-content:center}
+.adk-typing-dots{display:flex;align-items:center;gap:4px;min-height:16px;padding:1px 2px}
+.adk-typing-dots i{width:6px;height:6px;border-radius:50%;background:var(--cyan);opacity:.45;animation:blink 1s infinite}
+.adk-typing-dots i:nth-child(2){animation-delay:.15s}.adk-typing-dots i:nth-child(3){animation-delay:.3s}
+.adk-compose{display:flex;gap:8px}
+.adk-compose input{flex:1;min-width:0;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:9px;font:13px var(--font)}
+.adk-compose button{background:#1e2a44;color:var(--soft);border:1px solid #33415f;border-radius:8px;padding:6px 12px;font-weight:600;cursor:pointer}
+.adk-status{font-size:11px;color:var(--muted);min-height:14px}
 .urlbar{display:flex;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);align-items:center}
 .urlbar input{flex:1;min-width:0;background:rgba(0,0,0,.3);border:1px solid var(--line);border-radius:8px;color:var(--ink);font:12.5px var(--mono);padding:7px 10px}
 .urlbar button,.urlbar a{background:#1e2a44;color:var(--soft);border:1px solid #33415f;border-radius:8px;padding:6px 11px;font:600 12px var(--font);cursor:pointer;text-decoration:none;white-space:nowrap}
@@ -508,7 +553,7 @@ body.presenter #presenter{display:grid}
       <div class="p frag"><span class="ic">☏</span><div><h3>Depende de alguém por perto</h3><p>Cada dúvida vira uma interrupção para quem tem mais experiência no time.</p></div></div>
     </div>
   </div>
-  <div class="punch frag">O conhecimento já está na casa. <span>Falta um caminho até ele.</span></div>
+  <!-- <div class="punch frag">O conhecimento já está na casa. <span>Falta um caminho até ele.</span></div> -->
   <div class="foot"><span>Assistente de Onboarding</span><span class="pg"></span></div>
   <aside class="notes">
     <p>Pensem no primeiro mês de quem entra no time. Precisa aprender processos, sistemas e regras de negócio, tudo ao mesmo tempo.</p>
@@ -520,7 +565,7 @@ body.presenter #presenter{display:grid}
 </section>
 
 <!-- 3 · PROPOSTA -->
-<section class="slide" data-t="30">
+<!-- <section class="slide" data-t="30">
   <p class="eyebrow">A proposta</p>
   <h2>Um tutor ao lado de cada nova contratação</h2>
   <div class="trio">
@@ -545,41 +590,42 @@ body.presenter #presenter{display:grid}
       <div class="tags"><span class="tag">Fonte citada</span><span class="tag">Não inventa</span></div>
     </div>
   </div>
-  <p class="tagline frag" data-f="4">Quem faz é a pessoa. <b>O assistente guia e responde.</b></p>
-  <div class="foot"><span>Assistente de Onboarding</span><span class="pg"></span></div>
+  <!-- <p class="tagline frag" data-f="4">Quem faz é a pessoa. <b>O assistente guia e responde.</b></p> -->
+  <!-- <div class="foot"><span>Assistente de Onboarding</span><span class="pg"></span></div>
   <aside class="notes">
     <p>A proposta: um tutor ao lado de cada nova contratação. São três peças.</p>
     <p><span class="ck">clique</span> A missão: uma atividade real do time, escrita em etapas, com checkpoint em cada uma e critério de conclusão.</p>
     <p><span class="ck">clique</span> O Agente Tutor conduz essa missão. Uma etapa por vez, e só conclui com evidência.</p>
     <p><span class="ck">clique</span> Quando surge uma dúvida, ele chama o Agente de Conhecimento, que responde só com a documentação da casa e mostra de onde tirou.</p>
-    <p><span class="ck">clique</span> Quem faz é a pessoa. O assistente guia e responde.</p>
+     <p><span class="ck">clique</span> Quem faz é a pessoa. O assistente guia e responde.</p>
   </aside>
-</section>
+</section> -->
 
 <!-- 4 · COMO FUNCIONA -->
 <section class="slide" data-t="25">
   <p class="eyebrow">Como funciona</p>
-  <h2>Os documentos que já existem <em>viram respostas</em></h2>
+  <!-- <h2>Os documentos que já existem <em>viram respostas</em></h2> -->
+  <h2>Arquitetura utilizada na POC</h2>
   <div class="arch">
-    <div class="node person frag" data-f="2" style="grid-column:1;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-user"/></svg></span><strong>Nova<br>contratação</strong></div>
-    <div class="harrow both frag" data-f="2" style="grid-column:2;grid-row:1"><span class="l"></span></div>
-    <div class="node tutor frag" data-f="2" style="grid-column:3;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-tutor"/></svg></span><span class="tx"><span class="kind">Conduz</span><strong>Agente Tutor</strong><small>Uma etapa por vez, valida cada checkpoint</small></span></div>
-    <div class="harrow frag" data-f="3" style="grid-column:4;grid-row:1"><em>dúvida</em></div>
-    <div class="node know frag" data-f="3" style="grid-column:5;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-search"/></svg></span><span class="tx"><span class="kind">Responde</span><strong>Agente de Conhecimento</strong><small>Busca, responde e cita a fonte</small></span></div>
-    <div class="harrow frag" data-f="3" style="grid-column:6;grid-row:1"><em>busca</em></div>
-    <div class="node base frag" data-f="1" style="grid-column:7;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-db"/></svg></span><span class="tx"><span class="kind">Base pesquisável</span><strong>Conhecimento da casa</strong><small class="num">13 documentos → 644 trechos</small></span></div>
+    <div class="node person frag" data-f="1" style="grid-column:1;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-user"/></svg></span><strong>Nova<br>contratação</strong></div>
+    <div class="harrow both frag" data-f="1" style="grid-column:2;grid-row:1"><span class="l"></span></div>
+    <div class="node tutor frag" data-f="1" style="grid-column:3;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-tutor"/></svg></span><span class="tx"><span class="kind">Conduz</span><strong>Agente Tutor</strong><small>Uma etapa por vez, valida cada checkpoint</small></span></div>
+    <div class="harrow frag" data-f="2" style="grid-column:4;grid-row:1"><em>dúvida</em></div>
+    <div class="node know frag" data-f="2" style="grid-column:5;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-search"/></svg></span><span class="tx"><span class="kind">Responde</span><strong>Agente de Conhecimento</strong><small>Busca, responde e cita a fonte</small></span></div>
+    <div class="harrow frag" data-f="2" style="grid-column:6;grid-row:1"><em>busca</em></div>
+    <div class="node base frag" data-f="3" style="grid-column:7;grid-row:1"><span class="ib"><svg class="ic"><use href="#i-db"/></svg></span><span class="tx"><span class="kind">Base pesquisável</span><strong>Conhecimento da casa</strong><small class="num">13 documentos → 644 trechos</small></span></div>
 
-    <div class="varrow up frag" data-f="2" style="grid-column:3;grid-row:2"><em>carrega</em></div>
-    <div class="varrow up frag" data-f="1" style="grid-column:7;grid-row:2"><em>revisa e indexa</em></div>
+    <div class="varrow up frag" data-f="1" style="grid-column:3;grid-row:2"><em>carrega</em></div>
+    <div class="varrow up frag" data-f="3" style="grid-column:7;grid-row:2"><em>revisa e indexa</em></div>
 
-    <div class="node mission frag" data-f="2" style="grid-column:3;grid-row:3"><span class="ib"><svg class="ic"><use href="#i-mission"/></svg></span><span class="tx"><span class="kind">Missões</span><strong>Passo a passo em texto</strong><small>Etapas, checkpoints e evidência final</small></span></div>
-    <div class="node docs frag" data-f="1" style="grid-column:5/8;grid-row:3"><span class="ib"><svg class="ic"><use href="#i-docs"/></svg></span><span class="tx"><span class="kind">Fontes</span><strong>Documentos que já temos</strong><small>PDF, páginas HTML e Markdown, revisados por uma pessoa antes de entrar na base</small></span></div>
+    <div class="node mission frag" data-f="1" style="grid-column:3;grid-row:3"><span class="ib"><svg class="ic"><use href="#i-mission"/></svg></span><span class="tx"><span class="kind">Missões</span><strong>Passo a passo em texto</strong><small>Etapas, checkpoints e evidência final</small></span></div>
+    <div class="node docs frag" data-f="3" style="grid-column:5/8;grid-row:3"><span class="ib"><svg class="ic"><use href="#i-docs"/></svg></span><span class="tx"><span class="kind">Fontes</span><strong>Documentos que já temos</strong><small>PDF, páginas HTML e Markdown, revisados por uma pessoa antes de entrar na base</small></span></div>
   </div>
-  <div class="archnote frag" data-f="4">
+  <!-- <div class="archnote frag" data-f="4">
     <div><b>Missão nova = um arquivo de texto</b>Quem conhece o processo escreve; não muda código.</div>
     <div><b>Documento novo = reindexar</b>A base acompanha a documentação oficial.</div>
     <div><b>Papéis separados</b>Um conduz, o outro só responde com a base.</div>
-  </div>
+  </div> -->
   <div class="foot"><span>Assistente de Onboarding · Google ADK · Gemini · ChromaDB</span><span class="pg"></span></div>
   <aside class="notes">
     <p>Por trás, a arquitetura é simples.</p>
@@ -682,7 +728,7 @@ moram no mesmo bairro…</div></div>
 
 <!-- 5 · DEMO -->
 <section class="slide" data-t="50">
-  <div class="demo">
+  <div class="demo adk-chat-on">
     <div class="side">
       <p class="eyebrow" style="margin:0">Na prática</p>
       <h2>Demonstração</h2>
@@ -706,7 +752,7 @@ moram no mesmo bairro…</div></div>
       <p class="disclaimer">Pessoa e dados fictícios. Fluxo reproduzido a partir da missão real do repositório.</p>
     </div>
     <div class="chat">
-      <div class="bar"><i></i><i></i><i></i><span>ADK Web · agente_tutor</span><div class="seg" role="group" aria-label="Modo da demonstração"><button type="button" data-mode="replay" class="on">Reprodução</button><button type="button" data-mode="live">Ao vivo (local)</button></div></div>
+      <div class="bar"><i></i><i></i><i></i><span>ADK Web · agente_tutor</span><div class="seg" role="group" aria-label="Modo da demonstração"><button type="button" data-mode="replay" class="on">Reprodução</button><button type="button" data-mode="live">Ao vivo (local)</button></div><div class="live-switch" role="group" aria-label="Interface ao vivo"><button type="button" data-live-view="adk">ADK</button><button type="button" data-live-view="chat" class="on">Chat</button></div></div>
       <div class="feed">
         <div class="msg user frag" data-f="1"><div class="who">Ana</div><div class="bub">Oi! Começo hoje no time de IA. Por onde eu começo?</div></div>
         <div class="msg tutor bot frag" data-f="2"><div class="who">Tutor <span class="tool">listar_missoes()</span></div><div class="bub"><span class="dots"><b></b><b></b><b></b></span><span class="txt">Bem-vinda, Ana! Tenho duas missões: <b>Agente de IA</b> (rodar um agente na sua máquina) e <b>Originar proposta no SITE e conferir no ACOM</b>. Qual prefere?</span></div></div>
@@ -725,7 +771,8 @@ moram no mesmo bairro…</div></div>
       </div>
       <div class="livebox">
         <div class="urlbar"><input id="liveUrl" type="text" spellcheck="false" aria-label="URL do ADK Web local" value="http://127.0.0.1:8897/dev-ui/?app=agente_tutor"><button type="button" id="liveGo">Carregar</button><a id="liveOpen" href="http://127.0.0.1:8897/dev-ui/?app=agente_tutor" target="_blank" rel="noopener">↗ Nova aba</a></div>
-        <div class="frame"><div class="fallback"><span>Nada aparece? Rode <code>adk web ./apps --port 8897</code></span><span>e abra este HTML localmente. O deck publicado no Claude não carrega endereços locais.</span></div><iframe id="liveFrame" title="ADK Web local"></iframe></div>
+        <div class="frame"><div class="fallback"><span>Rode <code>adk web ./apps --port 8897 --allow_origins=null</code></span><span>O Chat acessa a API local a partir da origem <code>null</code> deste arquivo HTML.</span></div><iframe id="liveFrame" title="ADK Web local"></iframe></div>
+        <div class="adk-chat"><nav class="chat-list" id="adkSessions"><button class="new-chat" id="adkNew" type="button">＋ Novo chat</button></nav><div class="adk-conversation"><div class="adk-status" id="adkStatus">Conectando ao ADK local…</div><div class="adk-messages" id="adkMessages"></div><form class="adk-compose" id="adkForm"><input id="adkInput" autocomplete="off" placeholder="Escreva uma mensagem…" aria-label="Mensagem"><button type="submit">Enviar</button></form></div></div>
       </div>
     </div>
   </div>
@@ -740,12 +787,12 @@ moram no mesmo bairro…</div></div>
     <p><span class="ck">6</span> Agora uma pergunta que não está na base. Em vez de inventar, ele diz: não encontrei.</p>
     <p><span class="ck">7</span> Pulando para a última etapa: a Ana diz que terminou. O tutor não aceita só a palavra, pede a evidência.</p>
     <p><span class="ck">8</span> Com a evidência, a missão fecha. Informação de fácil acesso, sem perder a confiança.</p>
-    <p class="t">Demo ao vivo: tecla L (ou o botão “Ao vivo (local)”) troca o chat pelo ADK Web local. Avance pela janela do apresentador: com o foco no iframe, as setas vão para o ADK.</p>
+    <p class="t">Demo ao vivo: escolha ADK para abrir o ADK Web ou Chat para criar e retomar conversas no deck. Para o Chat, rode adk web ./apps --port 8897 --allow_origins=null.</p>
   </aside>
 </section>
 
 <!-- 6 · POR QUE ISSO VALE -->
-<section class="slide" data-t="30">
+<!-- <section class="slide" data-t="30">
   <p class="eyebrow">Proposta de valor</p>
   <h2>Por que isso vale</h2>
   <div class="values">
@@ -766,7 +813,7 @@ moram no mesmo bairro…</div></div>
     <p><span class="ck">clique</span> Para outro squad, é colocar os documentos, escrever as missões e reindexar.</p>
     <p><span class="ck">clique</span> O modelo é substituível. O contexto curado é o que fica.</p>
   </aside>
-</section>
+</section> -->
 
 <!-- 7 · TO-BE -->
 <section class="slide" data-t="25">
@@ -796,7 +843,7 @@ moram no mesmo bairro…</div></div>
 </section>
 
 <!-- 8 · MUNDO BV -->
-<section class="slide" data-t="35">
+<!-- <section class="slide" data-t="35">
   <p class="eyebrow">Aplicação</p>
   <h2>Como trazer para o Mundo BV</h2>
   <div class="bv">
@@ -825,7 +872,7 @@ moram no mesmo bairro…</div></div>
     <p><span class="ck">clique</span> Para isso, precisamos do negócio, de Tecnologia, de Segurança e de Educação corporativa.</p>
     <p><span class="ck">clique</span> O que pedimos hoje: uma área piloto, acesso aos manuais oficiais e um padrinho de negócio.</p>
   </aside>
-</section>
+</section> -->
 
 <!-- 9 · FECHAMENTO -->
 <section class="slide close" data-t="10">
@@ -967,6 +1014,43 @@ moram no mesmo bairro…</div></div>
   try{var su=localStorage.getItem(LKEY); if(su) urlIn.value=su;}catch(e){}
   openA.href=urlIn.value;
   function loadLive(){ var u=urlIn.value.trim(); openA.href=u; try{localStorage.setItem(LKEY,u);}catch(e){} if(frame.getAttribute('src')!==u) frame.setAttribute('src',u); }
+  var adkUser='pitch-demo', adkSession='', adkBase=function(){try{return new URL(urlIn.value).origin;}catch(e){return 'http://127.0.0.1:8897';}};
+  var sessionList=document.getElementById('adkSessions'), messagesBox=document.getElementById('adkMessages'), statusBox=document.getElementById('adkStatus');
+  var sessionNumbersKey=DECK+'-session-numbers', sessionNumbers={}, nextSessionNumber=1;
+  try{sessionNumbers=JSON.parse(sessionStorage.getItem(sessionNumbersKey)||'{}');Object.keys(sessionNumbers).forEach(function(id){nextSessionNumber=Math.max(nextSessionNumber,(+sessionNumbers[id]||0)+1);});}catch(e){}
+  function sessionNumber(id){if(!sessionNumbers[id]){sessionNumbers[id]=nextSessionNumber++;try{sessionStorage.setItem(sessionNumbersKey,JSON.stringify(sessionNumbers));}catch(e){}}return sessionNumbers[id];}
+  function adkUrl(path){return adkBase()+path;}
+  function adkSpeaker(author){if(author==='user')return 'Ana';return /conhec/i.test(author||'')?'Conhecimento':'Tutor';}
+  function scrollAdkToBottom(){requestAnimationFrame(function(){requestAnimationFrame(function(){messagesBox.scrollTop=messagesBox.scrollHeight;});});}
+  function adkBubble(speaker,body,kind){var d=document.createElement('div');d.className='adk-message '+(kind||'');var n=document.createElement('div');n.className='adk-speaker';n.textContent=speaker;var t=document.createElement('div');t.textContent=body;d.appendChild(n);d.appendChild(t);messagesBox.appendChild(d);scrollAdkToBottom();return d;}
+  function escapeHtml(value){return String(value).replace(/[&<>"']/g,function(ch){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch];});}
+  function renderMarkdown(source){var lines=String(source||'').replace(/\r/g,'').split('\n'),out=[],paragraph=[],listType='',inCode=false,code=[];
+    function inline(text){var safe=escapeHtml(text),codes=[];safe=safe.replace(/`([^`]+)`/g,function(_,v){codes.push('<code>'+v+'</code>');return '%%CODE'+(codes.length-1)+'%%';});safe=safe.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener">$1</a>');safe=safe.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>').replace(/__(.+?)__/g,'<strong>$1</strong>').replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>').replace(/~~(.+?)~~/g,'<del>$1</del>');return safe.replace(/%%CODE(\d+)%%/g,function(_,i){return codes[+i]||'';});}
+    function flushParagraph(){if(paragraph.length){out.push('<p>'+paragraph.map(inline).join('<br>')+'</p>');paragraph=[];}}
+    function closeList(){if(listType){out.push('</'+listType+'>');listType='';}}
+    lines.forEach(function(line){if(/^\s*```/.test(line)){flushParagraph();closeList();if(inCode){out.push('<pre><code>'+escapeHtml(code.join('\n'))+'</code></pre>');code=[];inCode=false;}else inCode=true;return;}if(inCode){code.push(line);return;}var m;
+      if(!line.trim()){flushParagraph();closeList();return;}
+      if((m=line.match(/^\s{0,3}(#{1,6})\s+(.+)$/))){flushParagraph();closeList();var level=m[1].length;out.push('<h'+level+'>'+inline(m[2])+'</h'+level+'>');return;}
+      if((m=line.match(/^\s*([-*+] |\d+\. )(.*)$/))){flushParagraph();var type=/^\s*\d+\./.test(line)?'ol':'ul';if(listType!==type){closeList();out.push('<'+type+'>');listType=type;}out.push('<li>'+inline(m[2])+'</li>');return;}
+      if((m=line.match(/^\s*>\s?(.*)$/))){flushParagraph();closeList();out.push('<blockquote>'+inline(m[1])+'</blockquote>');return;}
+      closeList();paragraph.push(line);
+    });flushParagraph();closeList();if(inCode)out.push('<pre><code>'+escapeHtml(code.join('\n'))+'</code></pre>');return out.join('');}
+  function adkMarkdownBubble(speaker,body,kind){var d=document.createElement('div');d.className='adk-message '+(kind||'');var n=document.createElement('div');n.className='adk-speaker';n.textContent=speaker;var t=document.createElement('div');t.className='adk-content';t.innerHTML=renderMarkdown(body);d.appendChild(n);d.appendChild(t);messagesBox.appendChild(d);scrollAdkToBottom();return d;}
+  function renderAdkMessages(items){messagesBox.innerHTML='';(items||[]).forEach(function(ev){if(ev.partial)return;var parts=(ev.content&&ev.content.parts)||[],speaker=adkSpeaker(ev.author),delegated=ev.actions&&ev.actions.transferToAgent,transferCall=null;
+    parts.forEach(function(p){if(p.functionCall&&p.functionCall.name==='transfer_to_agent')transferCall=p.functionCall;});
+    if(delegated||transferCall){var target=delegated||(transferCall.args&&(transferCall.args.agent_name||transferCall.args.agentName));adkBubble(speaker+' → '+adkSpeaker(target),'Delegando a pergunta para '+adkSpeaker(target)+'.','delegate-event');}
+    parts.forEach(function(p){if(p.functionCall){var fn=p.functionCall; if(fn.name==='transfer_to_agent'){}else{adkBubble(speaker+' · ferramenta',fn.name+(fn.args?'('+JSON.stringify(fn.args)+')':''),'tool-event');}}
+      if(p.text)adkMarkdownBubble(speaker,p.text,speaker==='Ana'?'user':(speaker==='Conhecimento'?'knowledge':''));});
+  });scrollAdkToBottom();}
+  function showTyping(speaker){var d=document.createElement('div');d.id='adkTyping';d.className='adk-message typing';d.setAttribute('aria-label',(speaker||'Tutor')+' pensando');var n=document.createElement('div');n.className='adk-speaker';n.textContent=speaker||'Tutor';var dots=document.createElement('div');dots.className='adk-typing-dots';for(var x=0;x<3;x++)dots.appendChild(document.createElement('i'));d.appendChild(n);d.appendChild(dots);messagesBox.appendChild(d);scrollAdkToBottom();}
+  function corsHint(e){return 'Falha de conexão ('+e.message+'). Reinicie com: adk web ./apps --port 8897 --allow_origins=null';}
+  function loadAdkSessions(selectId){statusBox.textContent='Carregando conversas…'; fetch(adkUrl('/apps/agente_tutor/users/'+encodeURIComponent(adkUser)+'/sessions')).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(function(data){var sessions=Array.isArray(data)?data:Object.keys(data||{}).map(function(k){return data[k];}); sessionList.querySelectorAll('.session-item').forEach(function(b){b.remove();}); sessions.forEach(function(s){var id=s.id||s.sessionId;if(!id)return;var item=document.createElement('div');item.className='session-item';var b=document.createElement('button');b.type='button';b.className='session-open';b.textContent='Chat '+sessionNumber(id);b.classList.toggle('active',id===selectId);b.onclick=function(){openAdkSession(id);};var del=document.createElement('button');del.type='button';del.className='session-delete';del.textContent='×';del.setAttribute('aria-label','Apagar Chat '+sessionNumber(id));del.title='Apagar chat';del.onclick=function(){deleteAdkSession(id);};item.appendChild(b);item.appendChild(del);sessionList.appendChild(item);});statusBox.textContent=sessions.length?'Conversas locais carregadas':'Crie um chat para começar';if(selectId)openAdkSession(selectId);}).catch(function(e){statusBox.textContent=corsHint(e);});}
+  function openAdkSession(id){adkSession=id;sessionList.querySelectorAll('button:not(#adkNew)').forEach(function(b){b.classList.toggle('active',b.textContent.indexOf(id.slice(0,8))>=0);});fetch(adkUrl('/apps/agente_tutor/users/'+encodeURIComponent(adkUser)+'/sessions/'+encodeURIComponent(id))).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(function(s){renderAdkMessages(s.events||[]);statusBox.textContent='Conversa carregada';}).catch(function(e){statusBox.textContent='Não foi possível carregar a conversa ('+e.message+')';});}
+  function newAdkSession(){statusBox.textContent='Criando conversa…';fetch(adkUrl('/apps/agente_tutor/users/'+encodeURIComponent(adkUser)+'/sessions'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({})}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.json();}).then(function(s){var id=s.id||s.sessionId;if(!id)throw Error('sessão sem identificador');sessionNumber(id);adkSession=id;messagesBox.innerHTML='';loadAdkSessions(id);}).catch(function(e){statusBox.textContent=corsHint(e);});}
+  function deleteAdkSession(id){statusBox.textContent='Apagando Chat '+sessionNumber(id)+'…';fetch(adkUrl('/apps/agente_tutor/users/'+encodeURIComponent(adkUser)+'/sessions/'+encodeURIComponent(id)),{method:'DELETE'}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);delete sessionNumbers[id];try{sessionStorage.setItem(sessionNumbersKey,JSON.stringify(sessionNumbers));}catch(e){}if(adkSession===id){adkSession='';messagesBox.innerHTML='';}loadAdkSessions();}).catch(function(e){statusBox.textContent='Não foi possível apagar o chat ('+e.message+')';});}
+  document.getElementById('adkNew').onclick=newAdkSession;
+  document.getElementById('adkForm').onsubmit=function(e){e.preventDefault();var input=document.getElementById('adkInput'), text=input.value.trim();if(!text)return;if(!adkSession){newAdkSession();statusBox.textContent='Crie uma conversa e envie novamente.';return;}input.value='';adkBubble('Ana',text,'user');showTyping('Tutor');statusBox.textContent='Aguardando resposta do agente…';fetch(adkUrl('/run_sse'),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({appName:'agente_tutor',userId:adkUser,sessionId:adkSession,newMessage:{role:'user',parts:[{text:text}]}})}).then(function(r){if(!r.ok)throw Error('HTTP '+r.status);return r.text();}).then(function(raw){var events=[];raw.split(/\r?\n/).forEach(function(line){if(line.indexOf('data:')===0){try{events.push(JSON.parse(line.slice(5).trim()));}catch(x){}}});loadAdkSessions(adkSession);renderAdkMessages(events);statusBox.textContent='Resposta recebida';}).catch(function(err){var typing=document.getElementById('adkTyping');if(typing)typing.remove();statusBox.textContent='Falha no envio ('+err.message+')';input.value=text;scrollAdkToBottom();});};
+  document.querySelectorAll('.live-switch button').forEach(function(b){b.onclick=function(e){e.stopPropagation();var chat=b.getAttribute('data-live-view')==='chat',d=document.querySelector('#stage .demo');d.classList.toggle('adk-chat-on',chat);document.querySelectorAll('.live-switch button').forEach(function(x){x.classList.toggle('on',x===b);});if(chat)loadAdkSessions(adkSession||undefined);};});
   function setLive(v,silent){
     live=!!v;
     var d=document.querySelector('#stage .demo'); if(d) d.classList.toggle('live-on',live);
